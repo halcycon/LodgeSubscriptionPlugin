@@ -5,18 +5,9 @@ use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class LodgeSubscriptionBundle extends PluginBundleBase
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-    }
-    
     /**
      * Called when plugin is installed
      */
