@@ -1,10 +1,10 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\EventListener;
+namespace MauticPlugin\LodgeSubscriptionBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use MauticPlugin\LodgeSubscriptionPlugin\Services\StripeService;
+use MauticPlugin\LodgeSubscriptionBundle\Services\StripeService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TokenSubscriber implements EventSubscriberInterface

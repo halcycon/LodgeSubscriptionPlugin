@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Form\Type;
+namespace MauticPlugin\LodgeSubscriptionBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

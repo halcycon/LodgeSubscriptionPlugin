@@ -1,10 +1,11 @@
 // Controller/RateController.php
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Controller;
+namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate;
-use MauticPlugin\LodgeSubscriptionPlugin\Form\Type\SubscriptionRateType;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
+use MauticPlugin\LodgeSubscriptionBundle\Form\Type\SubscriptionRateType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

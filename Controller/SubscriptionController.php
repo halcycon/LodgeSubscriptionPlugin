@@ -1,10 +1,11 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Controller;
+namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use MauticPlugin\LodgeSubscriptionPlugin\Form\Type\PaymentType;
+use Symfony\Component\HttpFoundation\Response;
+use MauticPlugin\LodgeSubscriptionBundle\Form\Type\PaymentType;
 
 class SubscriptionController extends AbstractFormController
 {

@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Form\Type;
+namespace MauticPlugin\LodgeSubscriptionBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate;
+use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
 
 class SubscriptionRateType extends AbstractType
 {

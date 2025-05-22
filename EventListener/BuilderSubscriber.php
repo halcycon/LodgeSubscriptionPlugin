@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\EventListener;
+namespace MauticPlugin\LodgeSubscriptionBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\EmailEvents;

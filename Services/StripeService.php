@@ -1,8 +1,8 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Services;
+namespace MauticPlugin\LodgeSubscriptionBundle\Services;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\LodgeSubscriptionPlugin\Helper\SubscriptionHelper;
+use MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use Symfony\Component\Routing\RouterInterface;

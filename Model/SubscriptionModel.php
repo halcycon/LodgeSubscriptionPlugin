@@ -1,11 +1,11 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Model;
+namespace MauticPlugin\LodgeSubscriptionBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\LodgeSubscriptionPlugin\Entity\Payment;
-use MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate;
+use MauticPlugin\LodgeSubscriptionBundle\Entity\Payment;
+use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
 
 class SubscriptionModel extends AbstractCommonModel
 {
@@ -14,7 +14,7 @@ class SubscriptionModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate');
+        return $this->em->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate');
     }
 
     /**
@@ -22,7 +22,7 @@ class SubscriptionModel extends AbstractCommonModel
      */
     public function getPaymentRepository()
     {
-        return $this->em->getRepository('MauticPlugin\LodgeSubscriptionPlugin\Entity\Payment');
+        return $this->em->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
     }
 
     /**

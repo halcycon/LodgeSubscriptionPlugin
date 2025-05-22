@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Controller;
+namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,12 +23,12 @@ class ReportController extends AbstractFormController
         $stats = $subscriptionModel->getSubscriptionStatusSummary($year);
         
         // Get payment statistics
-        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionPlugin\Entity\Payment');
+        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         $paymentStats = $paymentRepo->getPaymentStatistics($year);
         
         // Get available years for dropdown
         $rates = $this->getDoctrine()
-            ->getRepository('MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate')
+            ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
             ->getAllRates();
         
         $years = [];
@@ -59,7 +59,7 @@ class ReportController extends AbstractFormController
         $year = $request->query->get('year', date('Y'));
         
         // Get payment repository
-        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionPlugin\Entity\Payment');
+        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         
         // Get all payments for the year
         $startDate = new \DateTime($year . '-01-01');
@@ -96,5 +96,29 @@ class ReportController extends AbstractFormController
         $response->headers->set('Content-Disposition', 'attachment; filename="lodge_payments_' . $year . '.csv"');
         
         return $response;
+    }
+
+    public function annualReportAction(Request $request)
+    {
+        // ... existing code ...
+        
+        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        
+        // ... existing code ...
+        
+        $rateRepo = $this->getDoctrine()
+            ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
+            ->getRateForYear($year);
+        
+        // ... existing code ...
+    }
+    
+    public function contactReportAction(Request $request, $contactId)
+    {
+        // ... existing code ...
+        
+        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        
+        // ... existing code ...
     }
 } 

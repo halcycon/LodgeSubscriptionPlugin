@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Controller;
+namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;

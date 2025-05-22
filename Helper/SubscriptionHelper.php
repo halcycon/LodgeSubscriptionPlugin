@@ -1,9 +1,9 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Helper;
+namespace MauticPlugin\LodgeSubscriptionBundle\Helper;
 
 use Mautic\LeadBundle\Model\LeadModel;
 use Doctrine\ORM\EntityManager;
-use MauticPlugin\LodgeSubscriptionPlugin\Entity\Payment;
+use MauticPlugin\LodgeSubscriptionBundle\Entity\Payment;
 use Mautic\UserBundle\Model\UserModel;
 
 class SubscriptionHelper

@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Command;
+namespace MauticPlugin\LodgeSubscriptionBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -8,8 +8,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Doctrine\ORM\EntityManager;
-use MauticPlugin\LodgeSubscriptionPlugin\Helper\SubscriptionHelper;
-use MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate;
+use MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper;
+use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
 
 class YearEndProcessCommand extends Command
 {
@@ -91,7 +91,7 @@ class YearEndProcessCommand extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $output->writeln("<error>Error: " . $e->getMessage() . "</error>");
+            $output->writeln("<e>Error: " . $e->getMessage() . "</e>");
             return Command::FAILURE;
         }
     }
@@ -172,7 +172,7 @@ class YearEndProcessCommand extends Command
                 $processed++;
 
             } catch (\Exception $e) {
-                $output->writeln("<error>Error processing contact {$contact->getId()}: " . $e->getMessage() . "</error>");
+                $output->writeln("<e>Error processing contact {$contact->getId()}: " . $e->getMessage() . "</e>");
                 $errors++;
             }
         }
@@ -198,28 +198,33 @@ class YearEndProcessCommand extends Command
 
         $output->writeln("\nSending subscription reminders:");
         $sent = 0;
+        $errors = 0;
 
         foreach ($contacts as $contact) {
             if (!$contact->getEmail()) {
-                $output->writeln("  Skipping " . $contact->getName() . " - no email address");
+                $output->writeln("  Skipping contact {$contact->getId()} - no email address");
                 continue;
             }
 
             $output->writeln("  Sending reminder to: " . $contact->getEmail());
-            
+
             if (!$isDryRun) {
                 try {
                     $this->emailModel->sendEmail($email, [
                         'lead' => $contact,
-                        'email' => $contact->getEmail()
+                        'email' => $contact->getEmail(),
                     ]);
                     $sent++;
                 } catch (\Exception $e) {
-                    $output->writeln("<error>  Failed to send to " . $contact->getEmail() . ": " . $e->getMessage() . "</error>");
+                    $output->writeln("<e>Error sending email to {$contact->getEmail()}: " . $e->getMessage() . "</e>");
+                    $errors++;
                 }
+            } else {
+                $sent++;
             }
         }
 
+        $output->writeln("  Reminders sent: " . $sent);
         $output->writeln("  Reminders sent: " . $sent . " of " . count($contacts));
     }
 }
