@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin;
+namespace MauticPlugin\LodgeSubscriptionBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -15,8 +15,8 @@ class LodgeSubscriptionBundle extends PluginBundleBase
     {
         $tool = new SchemaTool($em);
         $entities = [
-            $em->getClassMetadata('MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate'),
-            $em->getClassMetadata('MauticPlugin\LodgeSubscriptionPlugin\Entity\Payment')
+            $em->getClassMetadata('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate'),
+            $em->getClassMetadata('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment')
         ];
 
         $tool->createSchema($entities);

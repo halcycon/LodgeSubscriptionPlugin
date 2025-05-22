@@ -11,52 +11,52 @@ return [
         'main' => [
             'mautic_subscription_rates' => [
                 'path' => '/lodge/rates/{page}',
-                'controller' => 'LodgeSubscriptionPlugin:Rate:index',
+                'controller' => 'LodgeSubscriptionBundle:Rate:index',
                 'defaults' => [
                     'page' => 1
                 ]
             ],
             'mautic_subscription_rate_new' => [
                 'path' => '/lodge/rate/new',
-                'controller' => 'LodgeSubscriptionPlugin:Rate:new'
+                'controller' => 'LodgeSubscriptionBundle:Rate:new'
             ],
             'mautic_subscription_rate_edit' => [
                 'path' => '/lodge/rate/{id}/edit',
-                'controller' => 'LodgeSubscriptionPlugin:Rate:edit'
+                'controller' => 'LodgeSubscriptionBundle:Rate:edit'
             ],
             'mautic_subscription_rate_delete' => [
                 'path' => '/lodge/rate/{id}/delete',
-                'controller' => 'LodgeSubscriptionPlugin:Rate:delete'
+                'controller' => 'LodgeSubscriptionBundle:Rate:delete'
             ],
             'mautic_subscription_rate_get' => [
                 'path' => '/lodge/rate/{year}/get',
-                'controller' => 'LodgeSubscriptionPlugin:Rate:getRate'
+                'controller' => 'LodgeSubscriptionBundle:Rate:getRate'
             ],
             'mautic_subscription_payment_form' => [
                 'path' => '/lodge/subscription/payment/{contactId}',
-                'controller' => 'LodgeSubscriptionPlugin:Subscription:paymentForm'
+                'controller' => 'LodgeSubscriptionBundle:Subscription:paymentForm'
             ],
             'mautic_subscription_record_payment' => [
                 'path' => '/lodge/subscription/payment/record',
-                'controller' => 'LodgeSubscriptionPlugin:Subscription:recordPayment',
+                'controller' => 'LodgeSubscriptionBundle:Subscription:recordPayment',
                 'method' => 'POST'
             ],
             'mautic_subscription_dashboard' => [
                 'path' => '/lodge/dashboard/{year}',
-                'controller' => 'LodgeSubscriptionPlugin:Report:dashboard',
+                'controller' => 'LodgeSubscriptionBundle:Report:dashboard',
                 'defaults' => [
                     'year' => null
                 ]
             ],
             'mautic_subscription_export' => [
                 'path' => '/lodge/export',
-                'controller' => 'LodgeSubscriptionPlugin:Report:export'
+                'controller' => 'LodgeSubscriptionBundle:Report:export'
             ]
         ],
         'api' => [
             'mautic_subscription_webhook' => [
                 'path' => '/lodge/webhook/stripe',
-                'controller' => 'LodgeSubscriptionPlugin:Webhook:handle',
+                'controller' => 'LodgeSubscriptionBundle:Webhook:handle',
                 'method' => 'POST'
             ]
         ]
@@ -99,25 +99,25 @@ return [
     'services' => [
         'events' => [
             'mautic.lodge.subscriber.token' => [
-                'class' => \MauticPlugin\LodgeSubscriptionPlugin\EventListener\TokenSubscriber::class,
+                'class' => \MauticPlugin\LodgeSubscriptionBundle\EventListener\TokenSubscriber::class,
                 'arguments' => [
                     'mautic.lodge.service.stripe'
                 ]
             ],
             'mautic.lodge.subscriber.builder' => [
-                'class' => \MauticPlugin\LodgeSubscriptionPlugin\EventListener\BuilderSubscriber::class,
+                'class' => \MauticPlugin\LodgeSubscriptionBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => []
             ]
         ],
         'forms' => [
             'mautic.lodge.form.type.config' => [
-                'class' => \MauticPlugin\LodgeSubscriptionPlugin\Form\Type\ConfigType::class,
+                'class' => \MauticPlugin\LodgeSubscriptionBundle\Form\Type\ConfigType::class,
                 'arguments' => []
             ]
         ],
         'models' => [
             'mautic.lodge.model.subscription' => [
-                'class' => \MauticPlugin\LodgeSubscriptionPlugin\Model\SubscriptionModel::class,
+                'class' => \MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager'
                 ]
@@ -125,7 +125,7 @@ return [
         ],
         'other' => [
             'mautic.lodge.service.stripe' => [
-                'class' => \MauticPlugin\LodgeSubscriptionPlugin\Services\StripeService::class,
+                'class' => \MauticPlugin\LodgeSubscriptionBundle\Services\StripeService::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'router',
@@ -133,7 +133,7 @@ return [
                 ]
             ],
             'mautic.lodge.helper.subscription' => [
-                'class' => \MauticPlugin\LodgeSubscriptionPlugin\Helper\SubscriptionHelper::class,
+                'class' => \MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'doctrine.orm.entity_manager',
@@ -143,16 +143,15 @@ return [
         ],
         'integrations' => [
             'mautic.integration.lodge' => [
-                'class' => \MauticPlugin\LodgeSubscriptionPlugin\Integration\LodgeSubscriptionIntegration::class,
+                'class' => MauticPlugin\LodgeSubscriptionBundle\Integration\LodgeSubscriptionIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
                     'doctrine.orm.entity_manager',
-                    'session',
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -160,13 +159,13 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc'
-                ]
-            ]
+                    'mautic.lead.model.dnc',
+                ],
+            ],
         ],
         'commands' => [
             'mautic.lodge.command.yearend' => [
-                'class' => \MauticPlugin\LodgeSubscriptionPlugin\Command\YearEndProcessCommand::class,
+                'class' => \MauticPlugin\LodgeSubscriptionBundle\Command\YearEndProcessCommand::class,
                 'arguments' => [
                     'mautic.lodge.helper.subscription',
                     'mautic.lead.model.field',

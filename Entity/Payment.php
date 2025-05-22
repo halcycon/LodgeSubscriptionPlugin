@@ -1,13 +1,13 @@
 // Entity/Payment.php
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Entity;
+namespace MauticPlugin\LodgeSubscriptionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * @ORM\Table(name="lodge_payments")
- * @ORM\Entity(repositoryClass="MauticPlugin\LodgeSubscriptionPlugin\Entity\PaymentRepository")
+ * @ORM\Entity(repositoryClass="MauticPlugin\LodgeSubscriptionBundle\Entity\PaymentRepository")
  */
 class Payment extends CommonEntity
 {

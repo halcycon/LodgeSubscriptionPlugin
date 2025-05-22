@@ -1,13 +1,13 @@
 // Entity/SubscriptionRate.php
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Entity;
+namespace MauticPlugin\LodgeSubscriptionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * @ORM\Table(name="lodge_subscription_rates")
- * @ORM\Entity(repositoryClass="MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRateRepository")
+ * @ORM\Entity(repositoryClass="MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRateRepository")
  */
 class SubscriptionRate extends CommonEntity
 {
@@ -84,6 +84,22 @@ class SubscriptionRate extends CommonEntity
     public function setDescription($description)
     {
         $this->description = $description;
+        return $this;
+    }
+
+    public function getDateAdded()
+    {
+        return $this->dateAdded;
+    }
+
+    public function getDateModified()
+    {
+        return $this->dateModified;
+    }
+
+    public function setDateModified(\DateTime $dateModified = null)
+    {
+        $this->dateModified = $dateModified;
         return $this;
     }
 }

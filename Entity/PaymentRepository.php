@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Entity;
+namespace MauticPlugin\LodgeSubscriptionBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
 

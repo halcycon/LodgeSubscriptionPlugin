@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\LodgeSubscriptionPlugin\Integration;
+namespace MauticPlugin\LodgeSubscriptionBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
