@@ -1,4 +1,3 @@
-// Entity/SubscriptionRateRepository.php
 <?php
 namespace MauticPlugin\LodgeSubscriptionBundle\Entity;
 

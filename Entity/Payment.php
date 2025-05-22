@@ -1,4 +1,3 @@
-// Entity/Payment.php
 <?php
 namespace MauticPlugin\LodgeSubscriptionBundle\Entity;
 
