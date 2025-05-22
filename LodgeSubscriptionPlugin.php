@@ -12,7 +12,8 @@ class LodgeSubscriptionPlugin extends PluginBundleBase
     {
         $tool = new SchemaTool($em);
         $entities = [
-            $em->getClassMetadata('MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate')
+            $em->getClassMetadata('MauticPlugin\LodgeSubscriptionPlugin\Entity\SubscriptionRate'),
+            $em->getClassMetadata('MauticPlugin\LodgeSubscriptionPlugin\Entity\Payment')
         ];
 
         $tool->createSchema($entities);
