@@ -38,4 +38,20 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
             'requires_authorization' => false
         ];
     }
+    
+    /**
+     * Initialize the integration
+     */
+    public function init()
+    {
+        // Do nothing
+    }
+    
+    /**
+     * Return plugin features
+     */
+    public function getSupportedFeatures()
+    {
+        return [];
+    }
 }
