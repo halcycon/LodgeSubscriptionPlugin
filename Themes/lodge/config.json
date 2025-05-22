@@ -1,0 +1,25 @@
+{
+    "name": "Lodge Subscription",
+    "author": "Adam Camp",
+    "authorUrl": "https://links.thecuckoocamp.co.uk",
+    "features": [
+        "page"
+    ],
+    "fields": {
+        "primary_color": {
+            "type": "text",
+            "value": "#1a4b84",
+            "label": "Primary Color"
+        },
+        "secondary_color": {
+            "type": "text",
+            "value": "#27ae60",
+            "label": "Secondary Color"
+        },
+        "font_family": {
+            "type": "text",
+            "value": "Arial, sans-serif",
+            "label": "Font Family"
+        }
+    }
+}

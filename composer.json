@@ -1,0 +1,15 @@
+{
+    "name": "lodge/subscription-plugin",
+    "description": "Masonic Lodge Subscription Management with Stripe Integration",
+    "type": "mautic-plugin",
+    "version": "1.0.0",
+    "require": {
+        "php": ">=7.4",
+        "stripe/stripe-php": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MauticPlugin\\LodgeSubscriptionPlugin\\": ""
+        }
+    }
+}

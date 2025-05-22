@@ -7,7 +7,52 @@ return [
     'version' => '1.0.0',
     'author' => 'Your Name',
 
-        'routes' => [        'main' => [            'mautic_subscription_rates' => [                'path' => '/lodge/rates/{page}',                'controller' => 'LodgeSubscriptionPlugin:Rate:index',                'defaults' => [                    'page' => 1                ]            ],            'mautic_subscription_rate_new' => [                'path' => '/lodge/rate/new',                'controller' => 'LodgeSubscriptionPlugin:Rate:new'            ],            'mautic_subscription_rate_edit' => [                'path' => '/lodge/rate/{id}/edit',                'controller' => 'LodgeSubscriptionPlugin:Rate:edit'            ],            'mautic_subscription_rate_delete' => [                'path' => '/lodge/rate/{id}/delete',                'controller' => 'LodgeSubscriptionPlugin:Rate:delete'            ],            'mautic_subscription_rate_get' => [                'path' => '/lodge/rate/{year}/get',                'controller' => 'LodgeSubscriptionPlugin:Rate:getRate'            ],            'mautic_subscription_payment_form' => [                'path' => '/lodge/subscription/payment/{contactId}',                'controller' => 'LodgeSubscriptionPlugin:Subscription:paymentForm'            ],            'mautic_subscription_record_payment' => [                'path' => '/lodge/subscription/payment/record',                'controller' => 'LodgeSubscriptionPlugin:Subscription:recordPayment',                'method' => 'POST'            ],            'mautic_subscription_dashboard' => [                'path' => '/lodge/dashboard/{year}',                'controller' => 'LodgeSubscriptionPlugin:Report:dashboard',                'defaults' => [                    'year' => null                ]            ],            'mautic_subscription_export' => [                'path' => '/lodge/export',                'controller' => 'LodgeSubscriptionPlugin:Report:export'            ]        ],
+    'routes' => [
+        'main' => [
+            'mautic_subscription_rates' => [
+                'path' => '/lodge/rates/{page}',
+                'controller' => 'LodgeSubscriptionPlugin:Rate:index',
+                'defaults' => [
+                    'page' => 1
+                ]
+            ],
+            'mautic_subscription_rate_new' => [
+                'path' => '/lodge/rate/new',
+                'controller' => 'LodgeSubscriptionPlugin:Rate:new'
+            ],
+            'mautic_subscription_rate_edit' => [
+                'path' => '/lodge/rate/{id}/edit',
+                'controller' => 'LodgeSubscriptionPlugin:Rate:edit'
+            ],
+            'mautic_subscription_rate_delete' => [
+                'path' => '/lodge/rate/{id}/delete',
+                'controller' => 'LodgeSubscriptionPlugin:Rate:delete'
+            ],
+            'mautic_subscription_rate_get' => [
+                'path' => '/lodge/rate/{year}/get',
+                'controller' => 'LodgeSubscriptionPlugin:Rate:getRate'
+            ],
+            'mautic_subscription_payment_form' => [
+                'path' => '/lodge/subscription/payment/{contactId}',
+                'controller' => 'LodgeSubscriptionPlugin:Subscription:paymentForm'
+            ],
+            'mautic_subscription_record_payment' => [
+                'path' => '/lodge/subscription/payment/record',
+                'controller' => 'LodgeSubscriptionPlugin:Subscription:recordPayment',
+                'method' => 'POST'
+            ],
+            'mautic_subscription_dashboard' => [
+                'path' => '/lodge/dashboard/{year}',
+                'controller' => 'LodgeSubscriptionPlugin:Report:dashboard',
+                'defaults' => [
+                    'year' => null
+                ]
+            ],
+            'mautic_subscription_export' => [
+                'path' => '/lodge/export',
+                'controller' => 'LodgeSubscriptionPlugin:Report:export'
+            ]
+        ],
         'api' => [
             'mautic_subscription_webhook' => [
                 'path' => '/lodge/webhook/stripe',
@@ -17,7 +62,39 @@ return [
         ]
     ],
 
-        'menu' => [        'main' => [            'priority' => 70,            'items' => [                'lodge.subscription' => [                    'label' => 'Lodge Subscriptions',                    'iconClass' => 'fa-money',                    'route' => 'mautic_subscription_dashboard',                    'checks' => [                        'integration' => [                            'LodgeSubscription' => [                                'enabled' => true                            ]                        ]                    ],                    'items' => [                        'lodge.subscription.dashboard' => [                            'label' => 'Dashboard',                            'route' => 'mautic_subscription_dashboard',                        ],                        'lodge.subscription.rates' => [                            'label' => 'Subscription Rates',                            'route' => 'mautic_subscription_rates',                        ],                        'lodge.subscription.export' => [                            'label' => 'Export Payments',                            'route' => 'mautic_subscription_export',                        ]                    ]                ]            ]        ]    ],
+    'menu' => [
+        'main' => [
+            'priority' => 70,
+            'items' => [
+                'lodge.subscription' => [
+                    'label' => 'Lodge Subscriptions',
+                    'iconClass' => 'fa-money',
+                    'route' => 'mautic_subscription_dashboard',
+                    'checks' => [
+                        'integration' => [
+                            'LodgeSubscription' => [
+                                'enabled' => true
+                            ]
+                        ]
+                    ],
+                    'items' => [
+                        'lodge.subscription.dashboard' => [
+                            'label' => 'Dashboard',
+                            'route' => 'mautic_subscription_dashboard',
+                        ],
+                        'lodge.subscription.rates' => [
+                            'label' => 'Subscription Rates',
+                            'route' => 'mautic_subscription_rates',
+                        ],
+                        'lodge.subscription.export' => [
+                            'label' => 'Export Payments',
+                            'route' => 'mautic_subscription_export',
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ],
 
     'services' => [
         'events' => [
@@ -64,7 +141,28 @@ return [
                 ]
             ]
         ],
-            'integrations' => [            'mautic.integration.lodge' => [                'class' => \MauticPlugin\LodgeSubscriptionPlugin\Integration\LodgeSubscriptionIntegration::class,                'arguments' => [                    'event_dispatcher',                    'mautic.helper.cache_storage',                    'doctrine.orm.entity_manager',                    'session',                    'request_stack',                    'router',                    'translator',                    'logger',                    'mautic.helper.encryption',                    'mautic.lead.model.lead',                    'mautic.lead.model.company',                    'mautic.helper.paths',                    'mautic.core.model.notification',                    'mautic.lead.model.field',                    'mautic.plugin.model.integration_entity',                    'mautic.lead.model.dnc'                ]            }
+        'integrations' => [
+            'mautic.integration.lodge' => [
+                'class' => \MauticPlugin\LodgeSubscriptionPlugin\Integration\LodgeSubscriptionIntegration::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc'
+                ]
+            ]
         ],
         'commands' => [
             'mautic.lodge.command.yearend' => [
