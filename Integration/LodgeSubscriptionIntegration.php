@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class LodgeSubscriptionIntegration extends AbstractIntegration
 {
@@ -22,7 +24,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
 
     public function getAuthenticationType(): string
     {
-        return 'keys';
+        return 'none';
     }
 
     public function getRequiredKeyFields(): array
@@ -32,6 +34,55 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
             'stripe_secret_key'      => 'mautic.lodge.stripe.secret.key',
             'stripe_webhook_secret'  => 'mautic.lodge.stripe.webhook.secret',
         ];
+    }
+
+    /**
+     * Override the form field definitions
+     */
+    public function modifyForm(array &$builder, array $data, string $formArea)
+    {
+        if ($formArea === 'keys') {
+            // Define stripe_publishable_key as TextType
+            $builder['stripe_publishable_key'] = [
+                'label'      => 'mautic.lodge.stripe.publishable.key',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'placeholder' => 'pk_test_...'
+                ],
+                'required'    => true,
+                'constraints' => [],
+                'type'        => TextType::class,
+            ];
+            
+            // Define stripe_secret_key as PasswordType
+            $builder['stripe_secret_key'] = [
+                'label'      => 'mautic.lodge.stripe.secret.key',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'placeholder' => 'sk_test_...',
+                    'autocomplete' => 'off',
+                ],
+                'required'    => true,
+                'constraints' => [],
+                'type'        => PasswordType::class,
+            ];
+            
+            // Define stripe_webhook_secret as PasswordType
+            $builder['stripe_webhook_secret'] = [
+                'label'      => 'mautic.lodge.stripe.webhook.secret',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'placeholder' => 'whsec_...',
+                    'autocomplete' => 'off',
+                ],
+                'required'    => true,
+                'constraints' => [],
+                'type'        => PasswordType::class,
+            ];
+        }
     }
 
     public function getFormSettings(): array
