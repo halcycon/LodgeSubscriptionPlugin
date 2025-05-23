@@ -52,7 +52,7 @@ class RateController extends AbstractFormController
                 'totalItems'  => $count,
                 'searchValue' => $search,
             ],
-            'contentTemplate' => '@LodgeSubscriptionBundle/SubscriptionRate/index.html.php',
+            'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:index.html.php',
             'pagetitle' => 'Subscription Rates'
         ]);
     }
@@ -99,7 +99,7 @@ class RateController extends AbstractFormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => '@LodgeSubscriptionBundle/SubscriptionRate/form.html.php',
+                'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'subscriptionRate',
                     'activeLink'    => '#mautic_subscription_rates',
@@ -159,7 +159,7 @@ class RateController extends AbstractFormController
                     'form' => $form->createView(),
                     'rate' => $rate,
                 ],
-                'contentTemplate' => '@LodgeSubscriptionBundle/SubscriptionRate/form.html.php',
+                'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'subscriptionRate',
                     'activeLink'    => '#mautic_subscription_rates',
