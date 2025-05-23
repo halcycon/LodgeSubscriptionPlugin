@@ -8,7 +8,7 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 class LodgeSubscriptionIntegration extends AbstractIntegration
 {
-    const INTEGRATION_NAME = 'LodgeSubscription';
+    public const INTEGRATION_NAME = 'LodgeSubscription';
 
     public function getName(): string
     {
@@ -30,7 +30,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
         return [
             'stripe_publishable_key' => 'mautic.lodge.stripe.publishable.key',
             'stripe_secret_key'      => 'mautic.lodge.stripe.secret.key',
-            'stripe_webhook_secret'  => 'mautic.lodge.stripe.webhook.secret'
+            'stripe_webhook_secret'  => 'mautic.lodge.stripe.webhook.secret',
         ];
     }
 
@@ -38,7 +38,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     {
         return [
             'requires_callback'      => false,
-            'requires_authorization' => false
+            'requires_authorization' => false,
         ];
     }
     
@@ -73,20 +73,18 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
      */
     public function getConfigFormSettings(): array
     {
-        return [
-            'keys' => [
-                'label' => 'mautic.integration.form.keys',
-                'data'  => $this->getFormSettings(),
-                'notes' => [
-                    'mautic.lodge.form.stripe.api.keys',
-                ],
+        $settings = parent::getConfigFormSettings();
+        
+        $settings['features'] = [
+            'label' => 'mautic.integration.form.feature.settings',
+            'data'  => [
+                'lodge_subscription_currency' => 'GBP',
+                'lodge_subscription_reminder_template' => null,
             ],
-            'settings' => [
-                'label'       => 'mautic.integration.form.settings',
-                'form_type'   => 'lodgesubscriptionconfig',
-                'data'        => $this->getFormLeadFields(),
-            ],
+            'form_type' => 'lodgesubscriptionconfig',
         ];
+        
+        return $settings;
     }
 
     /**
@@ -95,9 +93,11 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     public function getFormLeadFields(array $settings = []): array
     {
         // Return configured fields
+        $featureSettings = $this->getIntegrationSettings()->getFeatureSettings();
+        
         return [
-            'lodge_subscription_currency' => $this->getIntegrationSettings()->getFeatureSettings()['lodge_subscription_currency'] ?? 'GBP',
-            'lodge_subscription_reminder_template' => $this->getIntegrationSettings()->getFeatureSettings()['lodge_subscription_reminder_template'] ?? null,
+            'lodge_subscription_currency' => $featureSettings['lodge_subscription_currency'] ?? 'GBP',
+            'lodge_subscription_reminder_template' => $featureSettings['lodge_subscription_reminder_template'] ?? null,
         ];
     }
 }

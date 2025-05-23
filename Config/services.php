@@ -19,6 +19,15 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('MauticPlugin\\LodgeSubscriptionBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
     
+    // Explicitly register the integration
+    $services->set('mautic.integration.lodgesubscription', \MauticPlugin\LodgeSubscriptionBundle\Integration\LodgeSubscriptionIntegration::class)
+        ->public()
+        ->tag('mautic.integration', [
+            'isConfigured' => false,
+            'name' => 'LodgeSubscription',
+            'display' => 'Lodge Subscription Manager'
+        ]);
+    
     // Add service aliases for backward compatibility
     $services->alias('mautic.lodge.service.stripe', \MauticPlugin\LodgeSubscriptionBundle\Services\StripeService::class);
     $services->alias('mautic.lodge.helper.subscription', \MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper::class);

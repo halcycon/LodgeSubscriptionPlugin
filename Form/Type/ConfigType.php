@@ -7,7 +7,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('form.type')]
 class ConfigType extends AbstractType
 {
     private EmailModel $emailModel;

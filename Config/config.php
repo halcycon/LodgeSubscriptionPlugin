@@ -112,7 +112,9 @@ return [
         'forms' => [
             'mautic.lodge.form.type.config' => [
                 'class' => \MauticPlugin\LodgeSubscriptionBundle\Form\Type\ConfigType::class,
-                'arguments' => []
+                'arguments' => [
+                    'mautic.email.model.email'
+                ]
             ]
         ],
         'models' => [
