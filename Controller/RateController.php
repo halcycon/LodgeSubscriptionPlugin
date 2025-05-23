@@ -9,6 +9,7 @@ use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
 use MauticPlugin\LodgeSubscriptionBundle\Form\Type\SubscriptionRateType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -17,9 +18,13 @@ class RateController extends AbstractFormController
     protected EntityManagerInterface $entityManager;
     
     public function __construct(
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        RequestStack $requestStack
     ) {
         $this->entityManager = $entityManager;
+        
+        // Initialize the parent AbstractFormController with RequestStack
+        $this->requestStack = $requestStack;
     }
     
     /**

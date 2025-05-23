@@ -6,6 +6,7 @@ namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,12 +28,16 @@ class ReportController extends AbstractFormController
         LeadModel $leadModel, 
         EntityManagerInterface $entityManager,
         SubscriptionModel $subscriptionModel,
-        CorePermissions $permissions
+        CorePermissions $permissions,
+        RequestStack $requestStack
     ) {
         $this->leadModel = $leadModel;
         $this->entityManager = $entityManager;
         $this->subscriptionModel = $subscriptionModel;
         $this->permissions = $permissions;
+        
+        // Initialize the parent AbstractFormController with RequestStack
+        $this->requestStack = $requestStack;
     }
     
     /**
