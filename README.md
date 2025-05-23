@@ -14,8 +14,8 @@ This Mautic plugin helps manage lodge membership subscriptions, including paymen
 
 ## Requirements
 
-- Mautic 6.0.1 or higher
-- PHP 7.4 or higher
+- Mautic 6.0 or higher
+- PHP 8.1 or higher
 - Stripe account for online payments
 
 ## Installation
@@ -23,11 +23,11 @@ This Mautic plugin helps manage lodge membership subscriptions, including paymen
 1. Download or clone this repository to the `plugins` directory of your Mautic installation
 2. Clear the Mautic cache:
    ```
-   php app/console cache:clear
+   php bin/console cache:clear
    ```
 3. Install the plugin:
    ```
-   php app/console mautic:plugins:install
+   php bin/console mautic:plugins:install
    ```
 4. Go to the Plugins page in Mautic, find "Lodge Subscription Manager" and click "Configure"
 5. Enter your Stripe API keys and save the configuration
@@ -78,7 +78,7 @@ At the end of each year, run the year-end process:
 3. Click "Run Year-End Process"
 4. Alternatively, run the console command:
    ```
-   php app/console lodge:subscription:yearend --year=CURRENT_YEAR
+   php bin/console lodge:subscription:yearend --year=CURRENT_YEAR
    ```
 
 ## Email Tokens

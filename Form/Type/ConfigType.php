@@ -10,7 +10,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 
 class ConfigType extends AbstractType
 {
-    private $emailModel;
+    private EmailModel $emailModel;
 
     public function __construct(EmailModel $emailModel)
     {

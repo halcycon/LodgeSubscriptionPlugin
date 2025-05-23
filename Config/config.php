@@ -5,7 +5,7 @@ return [
     'name' => 'Lodge Subscription Manager',
     'description' => 'Manages Lodge subscriptions with Stripe integration',
     'version' => '1.0.0',
-    'author' => 'Your Name',
+    'author' => 'Adam Camp',
 
     'routes' => [
         'main' => [

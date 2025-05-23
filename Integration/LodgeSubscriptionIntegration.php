@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace MauticPlugin\LodgeSubscriptionBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -7,22 +10,22 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
 {
     const INTEGRATION_NAME = 'LodgeSubscription';
 
-    public function getName()
+    public function getName(): string
     {
         return self::INTEGRATION_NAME;
     }
 
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Lodge Subscription Manager';
     }
 
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
 
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'stripe_publishable_key' => 'mautic.lodge.stripe.publishable.key',
@@ -31,7 +34,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
         ];
     }
 
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         return [
             'requires_callback'      => false,
@@ -42,7 +45,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     /**
      * Initialize the integration
      */
-    public function init()
+    public function init(): void
     {
         // Do nothing
     }
@@ -50,7 +53,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     /**
      * Return plugin features
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [];
     }

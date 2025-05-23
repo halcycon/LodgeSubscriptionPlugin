@@ -17,4 +17,12 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\LodgeSubscriptionBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    // Load entity repositories as services
+    $services->load('MauticPlugin\\LodgeSubscriptionBundle\\Entity\\', '../Entity/*Repository.php');
+    
+    // Add service aliases for backward compatibility
+    $services->alias('mautic.lodge.service.stripe', \MauticPlugin\LodgeSubscriptionBundle\Services\StripeService::class);
+    $services->alias('mautic.lodge.helper.subscription', \MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper::class);
+    $services->alias('mautic.lodge.model.subscription', \MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel::class);
 }; 
