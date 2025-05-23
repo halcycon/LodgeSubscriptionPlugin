@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ReportController
+class ReportController extends AbstractStandardFormController
 {
     protected LeadModel $leadModel;
     protected EntityManagerInterface $entityManager;
@@ -35,12 +36,12 @@ class ReportController
     }
     
     /**
-     * Display subscription statistics dashboard
+     * Display subscription statistics dashboard (HTML view)
      */
     public function dashboardAction(Request $request, $year = null): Response
     {
         if (!$year) {
-            $year = date('Y');
+            $year = (int) date('Y');
         }
 
         // Get statistics using the injected model
@@ -61,15 +62,68 @@ class ReportController
         }
         
         // Add current year if not in the list
-        if (!in_array(date('Y'), $years)) {
-            $years[] = date('Y');
+        if (!in_array((int) date('Y'), $years)) {
+            $years[] = (int) date('Y');
         }
         
         // Sort years
         rsort($years);
         
-        // Return basic response with data
-        $content = json_encode([
+        return $this->delegateView([
+            'viewParameters' => [
+                'stats' => $stats,
+                'paymentStats' => $paymentStats,
+                'year' => $year,
+                'years' => $years,
+                'permissions' => [
+                    'view' => $this->permissions->isGranted('lodge:subscriptions:view'),
+                ]
+            ],
+            'contentTemplate' => 'LodgeSubscriptionBundle:Report:dashboard.html.php',
+            'passthroughVars' => [
+                'activeLink' => '#mautic_subscription_dashboard',
+                'mauticContent' => 'lodge_subscription_dashboard',
+                'route' => $this->generateUrl('mautic_subscription_dashboard', ['year' => $year])
+            ]
+        ]);
+    }
+
+    /**
+     * Dashboard API endpoint (JSON response)
+     */
+    public function dashboardApiAction(Request $request, $year = null): Response
+    {
+        if (!$year) {
+            $year = (int) date('Y');
+        }
+
+        // Get statistics using the injected model
+        $stats = $this->subscriptionModel->getSubscriptionStatusSummary($year);
+        
+        // Get payment statistics
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentStats = $paymentRepo->getPaymentStatistics($year);
+        
+        // Get available years for dropdown
+        $rates = $this->entityManager
+            ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
+            ->getAllRates();
+        
+        $years = [];
+        foreach ($rates as $rate) {
+            $years[] = $rate->getYear();
+        }
+        
+        // Add current year if not in the list
+        if (!in_array((int) date('Y'), $years)) {
+            $years[] = (int) date('Y');
+        }
+        
+        // Sort years
+        rsort($years);
+        
+        // Return JSON response for API
+        return new JsonResponse([
             'stats' => $stats,
             'paymentStats' => $paymentStats,
             'year' => $year,
@@ -78,8 +132,6 @@ class ReportController
                 'view' => $this->permissions->isGranted('lodge:subscriptions:view'),
             ]
         ]);
-        
-        return new Response($content, 200, ['Content-Type' => 'application/json']);
     }
 
     /**
