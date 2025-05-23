@@ -22,6 +22,7 @@ return function (ContainerConfigurator $configurator): void {
         'Migration',        // Database migrations
         'Tests',           // Test classes
         'Config',          // Configuration files
+        'Command',         // Commands are autowired automatically since Mautic 3
     ];
 
     $services->load('MauticPlugin\\LodgeSubscriptionBundle\\', '../')
