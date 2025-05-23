@@ -65,7 +65,7 @@ return [
         ],
         'api' => [
             'mautic_subscription_webhook' => [
-                'path' => '/lodge/webhook/stripe',
+                'path' => '/webhook/stripe',
                 'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\WebhookController::handleAction',
                 'method' => 'POST'
             ],
