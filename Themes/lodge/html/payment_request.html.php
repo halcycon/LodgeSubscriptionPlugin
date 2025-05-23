@@ -6,20 +6,21 @@
     </div>
 
     <div class="lodge-payment-summary">
-        <h2>Payment Details for {lodge_member_name}</h2>
+        <h2>Payment Details for <?php echo $lodge_member_name ?? '{lodge_member_name}'; ?></h2>
         <div class="lodge-amount-details">
-            <p>Current Year Subscription: <span class="lodge-amount">£{lodge_payment_amount}</span></p>
+            <p>Current Year Subscription: <span class="lodge-amount">£<?php echo $lodge_payment_amount ?? '{lodge_payment_amount}'; ?></span></p>
             
-            <?php if ({lodge_arrears_amount} > 0): ?>
-            <p>Outstanding Arrears: <span class="lodge-amount">£{lodge_arrears_amount}</span></p>
-            <p>Total Amount Due: <span class="lodge-amount">£{lodge_total_outstanding}</span></p>
+            <?php $arrears_amount = $lodge_arrears_amount ?? 0; ?>
+            <?php if ($arrears_amount > 0): ?>
+            <p>Outstanding Arrears: <span class="lodge-amount">£<?php echo $arrears_amount; ?></span></p>
+            <p>Total Amount Due: <span class="lodge-amount">£<?php echo $lodge_total_outstanding ?? '{lodge_total_outstanding}'; ?></span></p>
             <?php endif; ?>
         </div>
     </div>
 
     <div class="lodge-action">
         <p>Please click below to make your secure payment:</p>
-        <a href="{stripe_payment_link}" class="lodge-button">Pay Now</a>
+        <a href="<?php echo $stripe_payment_link ?? '{stripe_payment_link}'; ?>" class="lodge-button">Pay Now</a>
     </div>
 
     <div class="lodge-footer">
