@@ -141,36 +141,6 @@ return [
         ]
     ],
 
-    'services' => [
-        'models' => [
-            'mautic.lodge.model.subscription' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'doctrine.orm.entity_manager'
-                ]
-            ]
-        ],
-        'other' => [
-            'mautic.lodge.service.stripe' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\Services\StripeService::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'router',
-                    'mautic.lodge.helper.subscription'
-                ]
-            ],
-            'mautic.lodge.helper.subscription' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'doctrine.orm.entity_manager',
-                    'mautic.user.model.user'
-                ]
-            ]
-        ]
-    ],
-
     'parameters' => [
         'lodge_subscription_currency' => 'GBP',
         'lodge_subscription_reminder_template' => null

@@ -4,14 +4,32 @@ declare(strict_types=1);
 
 namespace MauticPlugin\LodgeSubscriptionBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\LodgeSubscriptionBundle\Entity\Payment;
 use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
+use Psr\Log\LoggerInterface;
 
 class SubscriptionModel extends AbstractCommonModel
 {
+    protected LeadModel $leadModel;
+    protected UserModel $userModel;
+    
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        LeadModel $leadModel,
+        UserModel $userModel,
+        ?LoggerInterface $logger = null
+    ) {
+        parent::__construct($entityManager);
+        $this->leadModel = $leadModel;
+        $this->userModel = $userModel;
+        $this->logger = $logger;
+    }
+
     /**
      * Get repository
      */

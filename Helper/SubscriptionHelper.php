@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Helper;
 
 use Mautic\LeadBundle\Model\LeadModel;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use MauticPlugin\LodgeSubscriptionBundle\Entity\Payment;
 use Mautic\UserBundle\Model\UserModel;
 
@@ -17,7 +17,7 @@ class SubscriptionHelper
 
     public function __construct(
         LeadModel $leadModel, 
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         UserModel $userModel
     ) {
         $this->leadModel = $leadModel;
