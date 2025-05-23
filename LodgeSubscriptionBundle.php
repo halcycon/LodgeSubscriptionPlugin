@@ -40,5 +40,6 @@ class LodgeSubscriptionBundle extends PluginBundleBase
     public static function loadAssets(MauticFactory $factory)
     {
         $factory->getAssetsHelper()->addStylesheet('plugins/LodgeSubscriptionBundle/Assets/css/lodge-subscription.css');
+        $factory->getAssetsHelper()->addScript('plugins/LodgeSubscriptionBundle/Assets/js/lodge-subscription.js');
     }
 } 

@@ -42,15 +42,21 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     public function modifyForm($builder, $options): void
     {
         if (!empty($options['form_area']) && $options['form_area'] === 'keys') {
+            // Add a custom attribute to the parent builder
+            if (method_exists($builder, 'setAttributes')) {
+                $builder->setAttributes(['class' => 'lodge-subscription-form']);
+            }
+            
             // Define stripe_publishable_key as TextType
             $builder->add('stripe_publishable_key', TextType::class, [
                 'label'      => 'mautic.lodge.stripe.publishable.key',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'       => 'form-control no-datepicker',
+                    'class'       => 'form-control no-datepicker lodge-key-field',
                     'placeholder' => 'pk_test_...',
                     'data-toggle' => 'NO',
-                    'data-no-calendar' => 'true'
+                    'data-no-calendar' => 'true',
+                    'data-field-type' => 'text-only'
                 ],
                 'required'    => true,
             ]);
@@ -60,9 +66,10 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                 'label'      => 'mautic.lodge.stripe.secret.key',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'       => 'form-control',
+                    'class'       => 'form-control lodge-key-field',
                     'placeholder' => 'sk_test_...',
                     'autocomplete' => 'off',
+                    'data-field-type' => 'password-only'
                 ],
                 'required'    => true,
             ]);
@@ -72,9 +79,10 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                 'label'      => 'mautic.lodge.stripe.webhook.secret',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'       => 'form-control',
+                    'class'       => 'form-control lodge-key-field',
                     'placeholder' => 'whsec_...',
                     'autocomplete' => 'off',
+                    'data-field-type' => 'password-only'
                 ],
                 'required'    => true,
             ]);

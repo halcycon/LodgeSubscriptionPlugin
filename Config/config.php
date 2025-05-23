@@ -7,10 +7,13 @@ return [
     'version' => '1.0.0',
     'author' => 'Adam Camp',
 
-    // Add CSS files
+    // Add CSS and JS files
     'onLoadCallback' => 'loadAssets',
     'css' => [
         'plugins/LodgeSubscriptionBundle/Assets/css/lodge-subscription.css',
+    ],
+    'js' => [
+        'plugins/LodgeSubscriptionBundle/Assets/js/lodge-subscription.js',
     ],
 
     'routes' => [

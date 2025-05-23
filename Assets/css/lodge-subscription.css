@@ -1,18 +1,49 @@
-/* Hide datepicker button for our fields */
-.no-datepicker + .btn-datepicker,
+/* Hide datepicker button and related elements */
+.btn.btn-tertiary.btn-icon.btn-nospin.btn-datepicker,
+label.btn.btn-tertiary.btn-icon.btn-nospin.btn-datepicker,
+.d-flex.gpp-3 > label.btn.btn-tertiary.btn-icon.btn-nospin.btn-datepicker,
+div[id="integration_details_apikeys"] .btn-datepicker,
+div[id="integration_details_apikeys"] .btn-tertiary.btn-icon,
+#integration_details_apikeys_stripe_publishable_key ~ .btn-datepicker,
 #integration_details_apikeys_stripe_publishable_key + .btn-datepicker,
-label[for="integration_details_apikeys_stripe_publishable_key"].btn-datepicker {
+div[id="integration_details_apikeys"] input + .btn-datepicker,
+div[id="integration_details_apikeys"] .d-flex > label,
+#integration_details_apikeys .d-flex > label[class*="btn-"] {
     display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
 }
 
-/* Add proper margin for fields */
-.no-datepicker {
-    margin-right: 0 !important;
-}
-
-/* Ensure fields use full width */
+/* Force text inputs to be wider */
 #integration_details_apikeys_stripe_publishable_key,
 #integration_details_apikeys_stripe_secret_key,
-#integration_details_apikeys_stripe_webhook_secret {
+#integration_details_apikeys_stripe_webhook_secret,
+div[id="integration_details_apikeys"] input[type="text"],
+div[id="integration_details_apikeys"] input[type="password"] {
     width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    flex-grow: 1 !important;
+}
+
+/* Fix form row layout */
+div[id="integration_details_apikeys"] .d-flex {
+    display: block !important;
+}
+
+/* Add some margin to fields */
+div[id="integration_details_apikeys"] .form-group {
+    margin-bottom: 15px !important;
+}
+
+/* Hide any floating size indicators */
+[size="32"] {
+    display: none !important;
 } 
