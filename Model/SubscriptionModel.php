@@ -60,7 +60,7 @@ class SubscriptionModel extends AbstractCommonModel
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('l')
-           ->from('MauticLeadBundle:Lead', 'l')
+           ->from(\Mautic\LeadBundle\Entity\Lead::class, 'l')
            ->where('l.craft_paid_current = :paid')
            ->andWhere('l.craft_owed_current > :zero')
            ->setParameter('paid', 0)
@@ -98,14 +98,14 @@ class SubscriptionModel extends AbstractCommonModel
             $paidField = "craft_{$year}_paid";
             
             // Check if the field exists
-            $metadata = $this->em->getClassMetadata('MauticLeadBundle:Lead');
+            $metadata = $this->em->getClassMetadata(\Mautic\LeadBundle\Entity\Lead::class);
             if (!$metadata->hasField($yearField) || !$metadata->hasField($paidField)) {
                 return $defaultResult;
             }
             
             $qb = $this->em->createQueryBuilder();
             $qb->select('COUNT(l) as totalCount, SUM(l.craft_owed_current) as currentTotal, SUM(l.craft_owed_arrears) as arrearsTotal')
-               ->from('MauticLeadBundle:Lead', 'l')
+               ->from(\Mautic\LeadBundle\Entity\Lead::class, 'l')
                ->where("l.{$yearField} = :due")
                ->setParameter('due', 1);
 
@@ -113,7 +113,7 @@ class SubscriptionModel extends AbstractCommonModel
 
             $paidQb = $this->em->createQueryBuilder();
             $paidQb->select('COUNT(l) as paidCount')
-                   ->from('MauticLeadBundle:Lead', 'l')
+                   ->from(\Mautic\LeadBundle\Entity\Lead::class, 'l')
                    ->where("l.{$yearField} = :due")
                    ->andWhere("l.{$paidField} = :paid")
                    ->setParameter('due', 1)

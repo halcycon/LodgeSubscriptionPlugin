@@ -132,7 +132,7 @@ class YearEndProcessCommand extends Command
 
     private function processContacts($currentYear, $nextYear, $newRate, OutputInterface $output, $isDryRun)
     {
-        $contacts = $this->entityManager->getRepository('MauticLeadBundle:Lead')->findAll();
+        $contacts = $this->entityManager->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->findAll();
         $processed = 0;
         $errors = 0;
 
@@ -196,7 +196,7 @@ class YearEndProcessCommand extends Command
             throw new \Exception("Email template ID {$emailTemplateId} not found");
         }
 
-        $contacts = $this->entityManager->getRepository('MauticLeadBundle:Lead')
+        $contacts = $this->entityManager->getRepository(\Mautic\LeadBundle\Entity\Lead::class)
             ->findBy(['craft_paid_current' => false]);
 
         $output->writeln("\nSending subscription reminders:");
