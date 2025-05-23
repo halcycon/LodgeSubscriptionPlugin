@@ -68,6 +68,33 @@ return [
                 'path' => '/lodge/webhook/stripe',
                 'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\WebhookController::handleAction',
                 'method' => 'POST'
+            ],
+            'mautic_subscription_dashboard_api' => [
+                'path' => '/lodge/api/dashboard/{year}',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\ReportController::dashboardAction',
+                'defaults' => [
+                    'year' => null
+                ]
+            ],
+            'mautic_subscription_rates_api' => [
+                'path' => '/lodge/api/rates/{page}',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\RateController::indexAction',
+                'defaults' => [
+                    'page' => 1
+                ]
+            ],
+            'mautic_subscription_rate_get_api' => [
+                'path' => '/lodge/api/rate/{year}/get',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\RateController::getRateAction'
+            ],
+            'mautic_subscription_export_api' => [
+                'path' => '/lodge/api/export',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\ReportController::exportAction'
+            ],
+            'mautic_subscription_record_payment_api' => [
+                'path' => '/lodge/api/payment/record',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\SubscriptionController::recordPaymentAction',
+                'method' => 'POST'
             ]
         ]
     ],
@@ -101,6 +128,12 @@ return [
                             'route' => 'mautic_subscription_export',
                         ]
                     ]
+                ],
+                'mautic.lodge.subscription' => [
+                    'route' => 'mautic_subscription_dashboard_api',
+                    'access' => ['lodge:subscriptions:view'],
+                    'parent' => 'mautic.core.channels',
+                    'priority' => 60
                 ]
             ]
         ]
@@ -126,16 +159,15 @@ return [
             ]
         ],
         'integrations' => [
-            'mautic.integration.lodge' => [
-                'class' => MauticPlugin\LodgeSubscriptionBundle\Integration\LodgeSubscriptionIntegration::class,
+            'mautic.integration.lodgesubscription' => [
+                'class' => \MauticPlugin\LodgeSubscriptionBundle\Integration\LodgeSubscriptionIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
                     'doctrine.orm.entity_manager',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.integration',
+                    'mautic.logger',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -145,7 +177,11 @@ return [
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
                 ],
-            ],
+                'tags' => [
+                    'mautic.integration',
+                    'mautic.basic_integration'
+                ]
+            ]
         ]
     ],
 
