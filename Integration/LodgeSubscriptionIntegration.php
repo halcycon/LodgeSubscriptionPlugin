@@ -22,7 +22,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
 
     public function getAuthenticationType(): string
     {
-        return 'none';
+        return 'keys';
     }
 
     public function getRequiredKeyFields(): array
@@ -56,5 +56,48 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     public function getSupportedFeatures(): array
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isConfigured(): bool
+    {
+        // Return true if keys are set
+        $keys = $this->getKeys();
+        return !empty($keys['stripe_publishable_key']) && !empty($keys['stripe_secret_key']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigFormSettings(): array
+    {
+        return [
+            'keys' => [
+                'label' => 'mautic.integration.form.keys',
+                'data'  => $this->getFormSettings(),
+                'notes' => [
+                    'mautic.lodge.form.stripe.api.keys',
+                ],
+            ],
+            'settings' => [
+                'label'       => 'mautic.integration.form.settings',
+                'form_type'   => 'lodgesubscriptionconfig',
+                'data'        => $this->getFormLeadFields(),
+            ],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormLeadFields(): array
+    {
+        // Return configured fields
+        return [
+            'lodge_subscription_currency' => $this->getIntegrationSettings()->getFeatureSettings()['lodge_subscription_currency'] ?? 'GBP',
+            'lodge_subscription_reminder_template' => $this->getIntegrationSettings()->getFeatureSettings()['lodge_subscription_reminder_template'] ?? null,
+        ];
     }
 }
