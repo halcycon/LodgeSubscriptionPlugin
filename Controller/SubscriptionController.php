@@ -38,7 +38,10 @@ class SubscriptionController extends AbstractFormController
         $this->subscriptionHelper = $subscriptionHelper;
         $this->stripeService = $stripeService;
         
-        // Initialize the parent AbstractFormController with RequestStack
+        // Call parent constructor to properly initialize AbstractFormController
+        parent::__construct();
+        
+        // Set the requestStack after parent initialization
         $this->requestStack = $requestStack;
     }
     
@@ -117,7 +120,7 @@ class SubscriptionController extends AbstractFormController
     /**
      * Display payment form
      */
-    public function paymentFormAction($contactId): Response
+    public function paymentFormAction(Request $request, $contactId): Response
     {
         $contact = $this->leadModel->getEntity($contactId);
         if (!$contact) {

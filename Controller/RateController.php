@@ -23,7 +23,10 @@ class RateController extends AbstractFormController
     ) {
         $this->entityManager = $entityManager;
         
-        // Initialize the parent AbstractFormController with RequestStack
+        // Call parent constructor to properly initialize AbstractFormController
+        parent::__construct();
+        
+        // Set the requestStack after parent initialization
         $this->requestStack = $requestStack;
     }
     

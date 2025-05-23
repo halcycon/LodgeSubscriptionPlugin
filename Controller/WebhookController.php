@@ -24,7 +24,10 @@ class WebhookController extends CommonController
         $this->stripeService = $stripeService;
         $this->logger = $logger;
         
-        // Initialize the parent CommonController with the required RequestStack
+        // Call parent constructor to properly initialize CommonController
+        parent::__construct();
+        
+        // Set the requestStack after parent initialization
         $this->requestStack = $requestStack;
     }
     
