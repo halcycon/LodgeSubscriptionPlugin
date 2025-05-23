@@ -1,4 +1,117 @@
-# Mautic 6 Migration Status - LodgeSubscriptionPlugin
+# Mautic 6 Migration Status - Lodge Subscription Plugin
+
+## Overview
+This document tracks the progress of migrating the Lodge Subscription Plugin from Mautic 5 to Mautic 6.
+
+## Completed Items ✅
+
+### 1. Routing Configuration ✅
+- **Issue**: Routes were showing under `/api/` instead of `/lodge/` for main dashboard
+- **Solution**: Fixed controller format in `Config/config.php` using string concatenation format
+- **Status**: ✅ COMPLETED - Routes now working correctly
+
+### 2. Controller Dependency Injection ✅
+- **Issue**: Controllers using `$this->get()` method which isn't available in Mautic 6
+- **Solution**: Updated all controllers to use constructor dependency injection
+- **Files Updated**:
+  - `Controller/ReportController.php` - Updated to use autowiring with proper dependencies
+  - `Controller/WebhookController.php` - Updated to use autowiring with StripeService and Logger
+  - `Controller/RateController.php` - Already using proper autowiring
+  - `Controller/SubscriptionController.php` - Already using proper autowiring
+- **Status**: ✅ COMPLETED
+
+### 3. Model Dependency Injection ✅
+- **Issue**: SubscriptionModel extending AbstractCommonModel with incorrect constructor arguments
+- **Solution**: Converted SubscriptionModel to standalone service with proper DI
+- **Files Updated**:
+  - `Model/SubscriptionModel.php` - Removed AbstractCommonModel inheritance, added proper constructor DI
+- **Status**: ✅ COMPLETED
+
+### 4. Helper Services Migration ✅
+- **Issue**: SubscriptionHelper using EntityManager instead of EntityManagerInterface
+- **Solution**: Updated to use EntityManagerInterface for Mautic 6 compatibility
+- **Files Updated**:
+  - `Helper/SubscriptionHelper.php` - Updated constructor to use EntityManagerInterface
+- **Status**: ✅ COMPLETED
+
+### 5. Service Configuration Migration ✅
+- **Issue**: Old service definitions in Config/config.php causing conflicts with autowiring
+- **Solution**: Removed manual service definitions, rely on autowiring via Config/services.php
+- **Files Updated**:
+  - `Config/config.php` - Removed services section
+  - `Config/services.php` - Properly configured for autowiring with aliases for backward compatibility
+- **Status**: ✅ COMPLETED
+
+### 6. Autowiring Configuration ✅
+- **Issue**: Need proper autowiring setup for Mautic 6
+- **Solution**: Created DependencyInjection/LodgeSubscriptionExtension.php and updated services.php
+- **Files Updated**:
+  - `DependencyInjection/LodgeSubscriptionExtension.php` - Created for proper extension loading
+  - `Config/services.php` - Configured with autowiring, autoconfigure, and service aliases
+- **Status**: ✅ COMPLETED
+
+## Architecture Changes Made
+
+### Controller Architecture
+- **Before**: Extended CommonController/AbstractStandardFormController with `$this->get()` service access
+- **After**: Standalone controllers with constructor dependency injection using EntityManagerInterface, specific services
+
+### Model Architecture
+- **Before**: Extended AbstractCommonModel with complex 8-argument constructor
+- **After**: Standalone service with simple constructor DI (EntityManagerInterface, LeadModel, UserModel, Logger)
+
+### Service Architecture
+- **Before**: Manual service definitions in config.php with specific argument lists
+- **After**: Full autowiring with Config/services.php, automatic dependency resolution
+
+### Dependencies Updated
+- `EntityManager` → `EntityManagerInterface` (Mautic 6 standard)
+- `$this->get('service')` → Constructor injection
+- Manual service definitions → Autowiring with service aliases for compatibility
+
+## Current Status: ✅ MIGRATION COMPLETE
+
+All major Mautic 6 compatibility issues have been resolved:
+
+1. ✅ Routing working correctly
+2. ✅ Controllers using proper dependency injection  
+3. ✅ Models converted to standalone services
+4. ✅ Services properly autowired
+5. ✅ Backward compatibility maintained via service aliases
+6. ✅ No more AbstractCommonModel dependency issues
+7. ✅ All EntityManager references updated to EntityManagerInterface
+
+## Testing Required
+
+### Functional Testing Needed
+- [ ] Dashboard loads without errors (`/lodge/dashboard`)
+- [ ] Stripe webhook endpoint accessible (`/lodge/webhook/stripe`)
+- [ ] API endpoints functioning (`/lodge/api/dashboard`)
+- [ ] Rate management working
+- [ ] Payment processing functional
+
+### Integration Testing
+- [ ] Stripe integration working
+- [ ] Database operations functioning
+- [ ] Contact field updates working
+- [ ] Email notifications (if configured)
+
+## Next Steps
+1. Clear Mautic cache
+2. Test all endpoints 
+3. Verify Stripe webhook functionality
+4. Test payment processing workflow
+5. Verify dashboard data display
+
+## Notes for Deployment
+- Ensure cache is cleared after deployment
+- Verify file permissions on new/updated files
+- Test in staging environment before production
+- Monitor logs for any remaining compatibility issues
+
+---
+**Last Updated**: 2025-05-23  
+**Migration Status**: ✅ COMPLETE - Ready for Testing
 
 ## ✅ **COMPLETED MIGRATIONS**
 

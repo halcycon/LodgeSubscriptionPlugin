@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -13,10 +12,12 @@ use MauticPlugin\LodgeSubscriptionBundle\Entity\Payment;
 use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
 use Psr\Log\LoggerInterface;
 
-class SubscriptionModel extends AbstractCommonModel
+class SubscriptionModel
 {
+    protected EntityManagerInterface $entityManager;
     protected LeadModel $leadModel;
     protected UserModel $userModel;
+    protected ?LoggerInterface $logger;
     
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -24,7 +25,7 @@ class SubscriptionModel extends AbstractCommonModel
         UserModel $userModel,
         ?LoggerInterface $logger = null
     ) {
-        parent::__construct($entityManager);
+        $this->entityManager = $entityManager;
         $this->leadModel = $leadModel;
         $this->userModel = $userModel;
         $this->logger = $logger;
@@ -35,7 +36,7 @@ class SubscriptionModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate');
+        return $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate');
     }
 
     /**
@@ -43,7 +44,7 @@ class SubscriptionModel extends AbstractCommonModel
      */
     public function getPaymentRepository()
     {
-        return $this->em->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        return $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
     }
 
     /**
@@ -59,7 +60,14 @@ class SubscriptionModel extends AbstractCommonModel
      */
     public function saveRate(SubscriptionRate $rate)
     {
-        $this->saveEntity($rate);
+        if (!$rate->getDateAdded()) {
+            $rate->setDateAdded(new \DateTime());
+        }
+        $rate->setDateModified(new \DateTime());
+        
+        $this->entityManager->persist($rate);
+        $this->entityManager->flush();
+        
         return $rate;
     }
 
@@ -76,7 +84,7 @@ class SubscriptionModel extends AbstractCommonModel
      */
     public function getContactsWithUnpaidSubscriptions()
     {
-        $qb = $this->em->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb->select('l')
            ->from(\Mautic\LeadBundle\Entity\Lead::class, 'l')
            ->where('l.craft_paid_current = :paid')
@@ -116,12 +124,12 @@ class SubscriptionModel extends AbstractCommonModel
             $paidField = "craft_{$year}_paid";
             
             // Check if the field exists
-            $metadata = $this->em->getClassMetadata(\Mautic\LeadBundle\Entity\Lead::class);
+            $metadata = $this->entityManager->getClassMetadata(\Mautic\LeadBundle\Entity\Lead::class);
             if (!$metadata->hasField($yearField) || !$metadata->hasField($paidField)) {
                 return $defaultResult;
             }
             
-            $qb = $this->em->createQueryBuilder();
+            $qb = $this->entityManager->createQueryBuilder();
             $qb->select('COUNT(l) as totalCount, SUM(l.craft_owed_current) as currentTotal, SUM(l.craft_owed_arrears) as arrearsTotal')
                ->from(\Mautic\LeadBundle\Entity\Lead::class, 'l')
                ->where("l.{$yearField} = :due")
@@ -129,7 +137,7 @@ class SubscriptionModel extends AbstractCommonModel
 
             $result = $qb->getQuery()->getOneOrNullResult();
 
-            $paidQb = $this->em->createQueryBuilder();
+            $paidQb = $this->entityManager->createQueryBuilder();
             $paidQb->select('COUNT(l) as paidCount')
                    ->from(\Mautic\LeadBundle\Entity\Lead::class, 'l')
                    ->where("l.{$yearField} = :due")
@@ -190,5 +198,30 @@ class SubscriptionModel extends AbstractCommonModel
         }
 
         return $created;
+    }
+
+    /**
+     * Get subscription rates with pagination
+     */
+    public function getSubscriptionRates($start = 0, $limit = 10)
+    {
+        return $this->getRepository()->getRates($start, $limit);
+    }
+
+    /**
+     * Delete a subscription rate
+     */
+    public function deleteRate(SubscriptionRate $rate)
+    {
+        $this->entityManager->remove($rate);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Get total count of rates
+     */
+    public function getCountRates()
+    {
+        return $this->getRepository()->countRates();
     }
 }
