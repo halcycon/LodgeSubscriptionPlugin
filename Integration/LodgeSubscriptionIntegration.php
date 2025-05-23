@@ -39,11 +39,11 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     /**
      * Override the form field definitions
      */
-    public function modifyForm(array &$builder, array $data, string $formArea)
+    public function modifyForm($builder, $options): void
     {
-        if ($formArea === 'keys') {
+        if (!empty($options['form_area']) && $options['form_area'] === 'keys') {
             // Define stripe_publishable_key as TextType
-            $builder['stripe_publishable_key'] = [
+            $builder->add('stripe_publishable_key', TextType::class, [
                 'label'      => 'mautic.lodge.stripe.publishable.key',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
@@ -51,12 +51,10 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                     'placeholder' => 'pk_test_...'
                 ],
                 'required'    => true,
-                'constraints' => [],
-                'type'        => TextType::class,
-            ];
+            ]);
             
             // Define stripe_secret_key as PasswordType
-            $builder['stripe_secret_key'] = [
+            $builder->add('stripe_secret_key', PasswordType::class, [
                 'label'      => 'mautic.lodge.stripe.secret.key',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
@@ -65,12 +63,10 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                     'autocomplete' => 'off',
                 ],
                 'required'    => true,
-                'constraints' => [],
-                'type'        => PasswordType::class,
-            ];
+            ]);
             
             // Define stripe_webhook_secret as PasswordType
-            $builder['stripe_webhook_secret'] = [
+            $builder->add('stripe_webhook_secret', PasswordType::class, [
                 'label'      => 'mautic.lodge.stripe.webhook.secret',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
@@ -79,9 +75,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                     'autocomplete' => 'off',
                 ],
                 'required'    => true,
-                'constraints' => [],
-                'type'        => PasswordType::class,
-            ];
+            ]);
         }
     }
 
