@@ -25,7 +25,7 @@ class WebhookController
     /**
      * Handle Stripe webhook
      */
-    public function handleAction(Request $request): Response
+    public function handle(Request $request): Response
     {
         // Retrieve the request's body and parse it as JSON
         $payload = $request->getContent();

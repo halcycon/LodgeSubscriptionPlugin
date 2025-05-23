@@ -38,7 +38,7 @@ class ReportController extends CommonController
     /**
      * Display subscription statistics dashboard (HTML view)
      */
-    public function dashboardAction(Request $request, $year = null): Response
+    public function dashboard(Request $request, $year = null): Response
     {
         if (!$year) {
             $year = (int) date('Y');
@@ -91,7 +91,7 @@ class ReportController extends CommonController
     /**
      * Dashboard API endpoint (JSON response)
      */
-    public function dashboardApiAction(Request $request, $year = null): Response
+    public function dashboardApi(Request $request, $year = null): Response
     {
         if (!$year) {
             $year = (int) date('Y');
@@ -137,7 +137,7 @@ class ReportController extends CommonController
     /**
      * Export payments report
      */
-    public function exportAction(Request $request): Response
+    public function export(Request $request): Response
     {
         $year = $request->query->get('year', date('Y'));
         
@@ -181,7 +181,7 @@ class ReportController extends CommonController
         return $response;
     }
 
-    public function annualReportAction(Request $request): Response
+    public function annualReport(Request $request): Response
     {
         $year = $request->query->get('year', date('Y'));
         
@@ -201,7 +201,7 @@ class ReportController extends CommonController
         return new Response($content, 200, ['Content-Type' => 'application/json']);
     }
     
-    public function contactReportAction(Request $request, $contactId): Response
+    public function contactReport(Request $request, $contactId): Response
     {
         $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         $payments = $paymentRepo->getContactPayments($contactId);
