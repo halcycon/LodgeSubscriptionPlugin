@@ -5,65 +5,73 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
 use MauticPlugin\LodgeSubscriptionBundle\Form\Type\SubscriptionRateType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 class RateController extends AbstractFormController
 {
+    protected SessionInterface $session;
+    protected EntityManagerInterface $entityManager;
+    
+    public function __construct(
+        SessionInterface $session,
+        EntityManagerInterface $entityManager
+    ) {
+        $this->session = $session;
+        $this->entityManager = $entityManager;
+    }
+    
     /**
      * List all subscription rates
      */
-    public function indexAction($page = 1): Response
+    public function indexAction(Request $request, $page = 1): Response
     {
-        $session = $this->get('session');
-
-        $limit  = $session->get('mautic.lodge.subscription.rate.limit', 10);
+        $limit  = $this->session->get('mautic.lodge.subscription.rate.limit', 10);
         $start  = (1 === $page) ? 0 : (($page - 1) * $limit);
-        $search = $this->request->get('search', $session->get('mautic.lodge.subscription.rate.search', ''));
+        $search = $request->get('search', $this->session->get('mautic.lodge.subscription.rate.search', ''));
 
-        $session->set('mautic.lodge.subscription.rate.search', $search);
-        $session->set('mautic.lodge.subscription.page', $page);
+        $this->session->set('mautic.lodge.subscription.rate.search', $search);
+        $this->session->set('mautic.lodge.subscription.page', $page);
 
-        $rates = $this->getDoctrine()
+        $rates = $this->entityManager
             ->getRepository(SubscriptionRate::class)
             ->getRates($start, $limit);
 
-        $count = $this->getDoctrine()
+        $count = $this->entityManager
             ->getRepository(SubscriptionRate::class)
             ->countRates();
 
-        $view = $this->renderView(
-            'LodgeSubscriptionBundle:SubscriptionRate:index.html.php',
-            [
+        return $this->delegateView([
+            'viewParameters' => [
                 'items'       => $rates,
                 'page'        => $page,
                 'limit'       => $limit,
                 'totalItems'  => $count,
                 'searchValue' => $search,
-            ]
-        );
-
-        return new Response($view);
+            ],
+            'contentTemplate' => '@LodgeSubscriptionBundle/SubscriptionRate/index.html.php',
+            'pagetitle' => 'Subscription Rates'
+        ]);
     }
 
     /**
      * Add new subscription rate
      */
-    public function newAction(): Response
+    public function newAction(Request $request): Response
     {
         $rate = new SubscriptionRate();
         $form = $this->createForm(SubscriptionRateType::class, $rate);
 
-        if ($this->request->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($rate);
-                    $em->flush();
+                    $this->entityManager->persist($rate);
+                    $this->entityManager->flush();
 
                     $this->addFlash(
                         'mautic.core.notice.created',
@@ -93,7 +101,7 @@ class RateController extends AbstractFormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:form.html.php',
+                'contentTemplate' => '@LodgeSubscriptionBundle/SubscriptionRate/form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'subscriptionRate',
                     'activeLink'    => '#mautic_subscription_rates',
@@ -106,9 +114,9 @@ class RateController extends AbstractFormController
     /**
      * Edit subscription rate
      */
-    public function editAction($id): Response
+    public function editAction(Request $request, $id): Response
     {
-        $rate = $this->getDoctrine()->getRepository(SubscriptionRate::class)->find($id);
+        $rate = $this->entityManager->getRepository(SubscriptionRate::class)->find($id);
 
         if (!$rate) {
             return $this->notFound();
@@ -116,14 +124,13 @@ class RateController extends AbstractFormController
 
         $form = $this->createForm(SubscriptionRateType::class, $rate);
 
-        if ($this->request->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $rate->setDateModified(new \DateTime());
                     
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($rate);
-                    $em->flush();
+                    $this->entityManager->persist($rate);
+                    $this->entityManager->flush();
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
@@ -154,7 +161,7 @@ class RateController extends AbstractFormController
                     'form' => $form->createView(),
                     'rate' => $rate,
                 ],
-                'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:form.html.php',
+                'contentTemplate' => '@LodgeSubscriptionBundle/SubscriptionRate/form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'subscriptionRate',
                     'activeLink'    => '#mautic_subscription_rates',
@@ -169,7 +176,7 @@ class RateController extends AbstractFormController
      */
     public function deleteAction($id): Response
     {
-        $rate = $this->getDoctrine()->getRepository(SubscriptionRate::class)->find($id);
+        $rate = $this->entityManager->getRepository(SubscriptionRate::class)->find($id);
 
         if (!$rate) {
             return $this->notFound();
@@ -177,9 +184,8 @@ class RateController extends AbstractFormController
 
         $year = $rate->getYear();
 
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($rate);
-        $em->flush();
+        $this->entityManager->remove($rate);
+        $this->entityManager->flush();
 
         $this->addFlash(
             'mautic.core.notice.deleted',
@@ -197,7 +203,7 @@ class RateController extends AbstractFormController
      */
     public function getRateAction($year): JsonResponse
     {
-        $rate = $this->getDoctrine()->getRepository(SubscriptionRate::class)
+        $rate = $this->entityManager->getRepository(SubscriptionRate::class)
             ->findOneBy(['year' => $year]);
 
         if (!$rate) {

@@ -75,7 +75,7 @@ class ReportController extends AbstractFormController
                     'view' => $this->security->isGranted('lodge:subscriptions:view'),
                 ]
             ],
-            'contentTemplate' => 'LodgeSubscriptionBundle:Report:dashboard.html.php',
+            'contentTemplate' => '@LodgeSubscriptionBundle/Report/dashboard.html.php',
             'pagetitle' => 'Subscription Dashboard'
         ]);
     }

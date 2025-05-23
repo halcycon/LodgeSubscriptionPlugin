@@ -1,4 +1,4 @@
-<?php $view->extend('LodgeSubscriptionBundle:Themes:lodge/html/page.html.php'); ?>
+<?php $view->extend('@LodgeSubscriptionBundle/Themes/lodge/html/page.html.php'); ?>
 
 <?php $view['slots']->set('pageTitle', 'Payment Cancelled'); ?>
 

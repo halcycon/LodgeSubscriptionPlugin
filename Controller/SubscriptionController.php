@@ -51,7 +51,7 @@ class SubscriptionController extends AbstractFormController
                 'limit' => $limit,
                 'totalRates' => count($rates)
             ],
-            'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:list.html.php',
+            'contentTemplate' => '@LodgeSubscriptionBundle/SubscriptionRate/list.html.php',
             'pagetitle' => 'Subscription Rates'
         ]);
     }
@@ -208,7 +208,7 @@ class SubscriptionController extends AbstractFormController
                     'totalOwed' => $totalOwed,
                     'stripePaymentLink' => $stripePaymentLink,
                 ],
-                'contentTemplate' => 'LodgeSubscriptionBundle:Subscription:payment_form.html.php',
+                'contentTemplate' => '@LodgeSubscriptionBundle/Subscription/payment_form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'subscriptionPayment',
                     'route' => $this->generateUrl(
