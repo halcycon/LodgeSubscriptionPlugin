@@ -46,7 +46,7 @@ class ScriptInjectionSubscriber implements EventSubscriberInterface
         // This is a very specific check to avoid affecting other pages
         if (strpos($uri, 'plugins/config/LodgeSubscription') !== false && 
             strpos($route, 'plugin_config') !== false) {
-            $event->addTemplate('LodgeSubscriptionBundle:Integration:inline_script.html.php');
+            $event->setTemplate('LodgeSubscriptionBundle:Integration:inline_script.html.php');
         }
     }
 } 

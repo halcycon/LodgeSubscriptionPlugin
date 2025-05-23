@@ -5,15 +5,28 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use MauticPlugin\LodgeSubscriptionBundle\Services\StripeService;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends CommonController
 {
+    private StripeService $stripeService;
+    private LoggerInterface $logger;
+    
+    public function __construct(
+        StripeService $stripeService,
+        LoggerInterface $logger
+    ) {
+        $this->stripeService = $stripeService;
+        $this->logger = $logger;
+    }
+    
     /**
      * Handle Stripe webhook
      */
-    public function handleAction(Request $request)
+    public function handleAction(Request $request): Response
     {
         // Retrieve the request's body and parse it as JSON
         $payload = $request->getContent();
@@ -26,17 +39,16 @@ class WebhookController extends CommonController
         }
 
         try {
-            $stripeService = $this->get('mautic.lodge.service.stripe');
-            $result = $stripeService->handleWebhook($payload, $sigHeader);
+            $result = $this->stripeService->handleWebhook($payload, $sigHeader);
 
             if ($result) {
-                $this->get('monolog.logger.mautic')->info('Stripe webhook processed successfully');
+                $this->logger->info('Stripe webhook processed successfully');
                 return new Response('Webhook handled successfully', 200);
             } else {
                 return new Response('Webhook processing failed', 500);
             }
         } catch (\Exception $e) {
-            $this->get('monolog.logger.mautic')->error('Error processing Stripe webhook: ' . $e->getMessage());
+            $this->logger->error('Error processing Stripe webhook: ' . $e->getMessage());
             return new Response($e->getMessage(), 400);
         }
     }

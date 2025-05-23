@@ -10,21 +10,25 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
 
 class ReportController extends AbstractFormController
 {
     private $leadModel;
     private $entityManager;
+    private $subscriptionModel;
     
     /**
      * Constructor
      */
     public function __construct(
         LeadModel $leadModel, 
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SubscriptionModel $subscriptionModel
     ) {
         $this->leadModel = $leadModel;
         $this->entityManager = $entityManager;
+        $this->subscriptionModel = $subscriptionModel;
     }
     
     /**
@@ -36,11 +40,8 @@ class ReportController extends AbstractFormController
             $year = date('Y');
         }
 
-        // Get the subscription model
-        $subscriptionModel = $this->get('mautic.lodge.model.subscription');
-        
-        // Get statistics
-        $stats = $subscriptionModel->getSubscriptionStatusSummary($year);
+        // Get statistics using the injected model
+        $stats = $this->subscriptionModel->getSubscriptionStatusSummary($year);
         
         // Get payment statistics
         $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
@@ -130,11 +131,11 @@ class ReportController extends AbstractFormController
     {
         // ... existing code ...
         
-        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         
         // ... existing code ...
         
-        $rateRepo = $this->getDoctrine()
+        $rateRepo = $this->entityManager
             ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
             ->getRateForYear($year);
         
@@ -145,7 +146,7 @@ class ReportController extends AbstractFormController
     {
         // ... existing code ...
         
-        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         
         // ... existing code ...
     }

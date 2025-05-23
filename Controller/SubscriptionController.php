@@ -5,21 +5,44 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\LodgeSubscriptionBundle\Form\Type\PaymentType;
+use MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper;
+use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
+use MauticPlugin\LodgeSubscriptionBundle\Services\StripeService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use MauticPlugin\LodgeSubscriptionBundle\Form\Type\PaymentType;
 
 class SubscriptionController extends AbstractFormController
 {
-    public function indexAction($page = 1)
+    private LeadModel $leadModel;
+    private CoreParametersHelper $coreParametersHelper;
+    private SubscriptionModel $subscriptionModel;
+    private SubscriptionHelper $subscriptionHelper;
+    private StripeService $stripeService;
+    
+    public function __construct(
+        LeadModel $leadModel,
+        CoreParametersHelper $coreParametersHelper,
+        SubscriptionModel $subscriptionModel,
+        SubscriptionHelper $subscriptionHelper,
+        StripeService $stripeService
+    ) {
+        $this->leadModel = $leadModel;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->subscriptionModel = $subscriptionModel;
+        $this->subscriptionHelper = $subscriptionHelper;
+        $this->stripeService = $stripeService;
+    }
+    
+    public function indexAction($page = 1): Response
     {
-        $subscriptionModel = $this->getModel('lodge.subscription');
-        
-        $limit = $this->get('mautic.helper.core_parameters')->get('default_pagelimit');
+        $limit = $this->coreParametersHelper->get('default_pagelimit');
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
 
-        $rates = $subscriptionModel->getSubscriptionRates($start, $limit);
+        $rates = $this->subscriptionModel->getSubscriptionRates($start, $limit);
         
         return $this->delegateView([
             'viewParameters' => [
@@ -33,7 +56,7 @@ class SubscriptionController extends AbstractFormController
         ]);
     }
 
-    public function newRateAction(Request $request)
+    public function newRateAction(Request $request): JsonResponse
     {
         $year = $request->request->get('year');
         $amount = $request->request->get('amount');
@@ -46,7 +69,7 @@ class SubscriptionController extends AbstractFormController
         }
 
         try {
-            $this->getModel('lodge.subscription')->saveRate($year, $amount);
+            $this->subscriptionModel->saveRate($year, $amount);
             return new JsonResponse(['success' => true]);
         } catch (\Exception $e) {
             return new JsonResponse([
@@ -56,20 +79,19 @@ class SubscriptionController extends AbstractFormController
         }
     }
 
-    public function processPaymentAction(Request $request)
+    public function processPaymentAction(Request $request): JsonResponse
     {
         $contactId = $request->request->get('contactId');
         $amount = $request->request->get('amount');
         
         try {
-            $stripeService = $this->get('mautic.lodge.service.stripe');
-            $contact = $this->getModel('lead')->getEntity($contactId);
+            $contact = $this->leadModel->getEntity($contactId);
             
             if (!$contact) {
                 throw new \Exception('Contact not found');
             }
 
-            $session = $stripeService->createCheckoutSession(
+            $session = $this->stripeService->createCheckoutSession(
                 $contactId,
                 $amount,
                 $contact->getEmail()
@@ -90,9 +112,9 @@ class SubscriptionController extends AbstractFormController
     /**
      * Display payment form
      */
-    public function paymentFormAction($contactId)
+    public function paymentFormAction($contactId): Response
     {
-        $contact = $this->getModel('lead')->getEntity($contactId);
+        $contact = $this->leadModel->getEntity($contactId);
         if (!$contact) {
             return $this->notFound();
         }
@@ -120,12 +142,9 @@ class SubscriptionController extends AbstractFormController
                 if ($this->isFormValid($form)) {
                     $formData = $form->getData();
                     
-                    // Get the subscription helper service
-                    $subscriptionHelper = $this->get('mautic.lodge.helper.subscription');
-                    
                     try {
                         // Record the payment
-                        $payment = $subscriptionHelper->recordPayment(
+                        $payment = $this->subscriptionHelper->recordPayment(
                             $contactId,
                             $formData['amount'],
                             $formData['year'],
@@ -168,8 +187,7 @@ class SubscriptionController extends AbstractFormController
         $stripePaymentLink = null;
         if ($totalOwed > 0) {
             try {
-                $stripeService = $this->get('mautic.lodge.service.stripe');
-                $session = $stripeService->createCheckoutSession(
+                $session = $this->stripeService->createCheckoutSession(
                     $contactId,
                     $totalOwed,
                     $contact->getEmail()
@@ -205,7 +223,7 @@ class SubscriptionController extends AbstractFormController
     /**
      * Record a manual payment
      */
-    public function recordPaymentAction(Request $request)
+    public function recordPaymentAction(Request $request): JsonResponse
     {
         $contactId = $request->request->get('contactId');
         $amount = $request->request->get('amount');
@@ -217,10 +235,8 @@ class SubscriptionController extends AbstractFormController
         }
         
         try {
-            $subscriptionHelper = $this->get('mautic.lodge.helper.subscription');
-            
             // Record the payment
-            $payment = $subscriptionHelper->recordPayment(
+            $payment = $this->subscriptionHelper->recordPayment(
                 $contactId,
                 $amount,
                 date('Y'),
@@ -244,7 +260,7 @@ class SubscriptionController extends AbstractFormController
     /**
      * Generate a payment link
      */
-    public function generatePaymentLinkAction(Request $request)
+    public function generatePaymentLinkAction(Request $request): JsonResponse
     {
         $contactId = $request->request->get('contactId');
         $amount = $request->request->get('amount');
@@ -254,7 +270,7 @@ class SubscriptionController extends AbstractFormController
         }
 
         try {
-            $contact = $this->getModel('lead')->getEntity($contactId);
+            $contact = $this->leadModel->getEntity($contactId);
             if (!$contact) {
                 return new JsonResponse(['success' => false, 'message' => 'Contact not found']);
             }
@@ -264,8 +280,7 @@ class SubscriptionController extends AbstractFormController
                 return new JsonResponse(['success' => false, 'message' => 'Contact has no email address']);
             }
 
-            $stripeService = $this->get('mautic.lodge.service.stripe');
-            $session = $stripeService->createCheckoutSession($contactId, $amount, $email);
+            $session = $this->stripeService->createCheckoutSession($contactId, $amount, $email);
 
             return new JsonResponse([
                 'success' => true,
