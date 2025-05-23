@@ -157,31 +157,6 @@ return [
                     'mautic.user.model.user'
                 ]
             ]
-        ],
-        'integrations' => [
-            'mautic.integration.lodgesubscription' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\Integration\LodgeSubscriptionIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.integration',
-                    'mautic.logger',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
-                ],
-                'tags' => [
-                    'mautic.integration',
-                    'mautic.basic_integration'
-                ]
-            ]
         ]
     ],
 
