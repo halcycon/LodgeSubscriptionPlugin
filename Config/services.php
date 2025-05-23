@@ -22,11 +22,7 @@ return function (ContainerConfigurator $configurator): void {
     // Explicitly register the integration
     $services->set('mautic.integration.lodgesubscription', \MauticPlugin\LodgeSubscriptionBundle\Integration\LodgeSubscriptionIntegration::class)
         ->public()
-        ->tag('mautic.integration', [
-            'isConfigured' => false,
-            'name' => 'LodgeSubscription',
-            'display' => 'Lodge Subscription Manager'
-        ]);
+        ->tag('mautic.integration');
     
     // Add service aliases for backward compatibility
     $services->alias('mautic.lodge.service.stripe', \MauticPlugin\LodgeSubscriptionBundle\Services\StripeService::class);
