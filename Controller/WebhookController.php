@@ -51,4 +51,17 @@ class WebhookController
             return new Response($e->getMessage(), 400);
         }
     }
+
+    /**
+     * Test endpoint to verify webhook is accessible (GET request)
+     */
+    public function testAction(): Response
+    {
+        return new Response(json_encode([
+            'status' => 'Webhook endpoint is accessible',
+            'note' => 'This is a test endpoint. The actual webhook only accepts POST requests with valid Stripe signatures.',
+            'webhook_url' => '/lodge/webhook/stripe',
+            'method' => 'POST only'
+        ]), 200, ['Content-Type' => 'application/json']);
+    }
 }

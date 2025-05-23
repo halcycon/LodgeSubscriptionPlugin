@@ -8,8 +8,8 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$view['slots']->set('mauticContent', 'subscriptionRate');
-$view['slots']->set('headerTitle', 'Subscription Rates');
+$view['slots']->set('mauticContent', 'lodge_subscription_rates');
+$view['slots']->set('headerTitle', 'Lodge Subscription Rates');
 
 // Set up security checks
 $security = $view['security'];
@@ -22,101 +22,131 @@ $permissions = [
 
 <?php if ($permissions['create']): ?>
     <?php $view['slots']->start('actions'); ?>
-    <a href="<?php echo $view['router']->path('mautic_subscription_rate_new'); ?>" class="btn btn-default" data-toggle="ajax">
-        <i class="fa fa-plus"></i> <?php echo $view['translator']->trans('New Rate'); ?>
+    <a href="<?php echo $view['router']->path('mautic_subscription_rate_new'); ?>" class="btn btn-default">
+        <i class="fa fa-plus"></i> Add New Rate
     </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<div class="panel panel-default bdr-t-wdh-0">
-    <div class="panel-body">
-        <div class="box-layout">
-            <div class="col-xs-12 col-md-9">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="subscription-rate-search" placeholder="Search Rates..." value="<?php echo $view->escape($searchValue); ?>">
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" id="subscription-rate-search-btn">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </span>
+<div class="lodge-subscription-rates">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-list"></i>
+                Subscription Rates Management
+            </h3>
+        </div>
+        <div class="panel-body">
+            <?php if (empty($rates)): ?>
+                <div class="alert alert-info">
+                    <p><strong>No subscription rates found.</strong></p>
+                    <p>You need to create subscription rates for each year to manage lodge subscriptions.</p>
+                    <?php if ($permissions['create']): ?>
+                        <a href="<?php echo $view['router']->path('mautic_subscription_rate_new'); ?>" class="btn btn-primary">
+                            <i class="fa fa-plus"></i> Create First Rate
+                        </a>
+                    <?php endif; ?>
                 </div>
-            </div>
-            <div class="col-xs-12 col-md-3">
-                <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
-                    'totalItems' => $totalItems,
-                    'page'       => $page,
-                    'limit'      => $limit,
-                    'baseUrl'    => $view['router']->path('mautic_subscription_rates'),
-                    'sessionVar' => 'lodge.subscription.rate',
-                ]); ?>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Amount</th>
+                                <th>Description</th>
+                                <th>Date Added</th>
+                                <th>Last Modified</th>
+                                <th class="text-center" width="100">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($rates as $rate): ?>
+                                <tr>
+                                    <td>
+                                        <strong><?php echo $rate->getYear(); ?></strong>
+                                        <?php if ($rate->getYear() == date('Y')): ?>
+                                            <span class="label label-primary">Current Year</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <span class="text-success">
+                                            <strong>£<?php echo number_format($rate->getAmount(), 2); ?></strong>
+                                        </span>
+                                    </td>
+                                    <td><?php echo $rate->getDescription() ?: '<em>No description</em>'; ?></td>
+                                    <td>
+                                        <span class="text-muted">
+                                            <?php echo $rate->getDateAdded()->format('d M Y'); ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">
+                                            <?php echo $rate->getDateModified() ? $rate->getDateModified()->format('d M Y') : 'Never'; ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-xs" role="group">
+                                            <?php if ($permissions['edit']): ?>
+                                                <a href="<?php echo $view['router']->path('mautic_subscription_rate_edit', ['id' => $rate->getId()]); ?>" 
+                                                   class="btn btn-primary btn-xs" title="Edit Rate">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                            <?php endif; ?>
+                                            <?php if ($permissions['delete']): ?>
+                                                <a href="<?php echo $view['router']->path('mautic_subscription_rate_delete', ['id' => $rate->getId()]); ?>" 
+                                                   class="btn btn-danger btn-xs" title="Delete Rate"
+                                                   onclick="return confirm('Are you sure you want to delete the rate for year <?php echo $rate->getYear(); ?>?');">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <h4><i class="fa fa-info-circle"></i> Rate Management Tips</h4>
+                            <ul class="mb-0">
+                                <li>Each year should have only one subscription rate</li>
+                                <li>Create rates in advance for upcoming years</li>
+                                <li>The current year rate is used for new subscription calculations</li>
+                                <li>Historical rates are preserved for reporting purposes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Quick Actions Panel -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-cogs"></i>
+                Quick Actions
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="btn-group" role="group">
+                <a href="<?php echo $view['router']->path('mautic_subscription_dashboard'); ?>" class="btn btn-default">
+                    <i class="fa fa-dashboard"></i> Back to Dashboard
+                </a>
+                <?php if ($permissions['create']): ?>
+                    <a href="<?php echo $view['router']->path('mautic_subscription_rate_new'); ?>" class="btn btn-success">
+                        <i class="fa fa-plus"></i> Add New Rate
+                    </a>
+                <?php endif; ?>
+                <a href="<?php echo $view['router']->path('mautic_subscription_export'); ?>" class="btn btn-primary">
+                    <i class="fa fa-download"></i> Export Payments
+                </a>
             </div>
         </div>
     </div>
-    <div class="panel-heading">
-        <h3 class="panel-title">Subscription Rates</h3>
-    </div>
-    <div class="table-responsive panel-collapse pull out">
-        <table class="table table-hover table-striped table-bordered rate-list">
-            <thead>
-                <tr>
-                    <th class="col-rate-year">Year</th>
-                    <th class="col-rate-amount">Amount</th>
-                    <th class="col-rate-description">Description</th>
-                    <th class="col-rate-actions"><?php echo $view['translator']->trans('Actions'); ?></th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php if (count($items)): ?>
-                <?php foreach ($items as $rate): ?>
-                    <tr>
-                        <td><?php echo $rate->getYear(); ?></td>
-                        <td><?php echo number_format($rate->getAmount(), 2); ?></td>
-                        <td><?php echo $view->escape($rate->getDescription()); ?></td>
-                        <td>
-                            <?php if ($permissions['edit']): ?>
-                                <a href="<?php echo $view['router']->path('mautic_subscription_rate_edit', ['id' => $rate->getId()]); ?>" data-toggle="ajax" class="btn btn-default btn-xs">
-                                    <i class="fa fa-pencil"></i>
-                                </a>
-                            <?php endif; ?>
-                            <?php if ($permissions['delete']): ?>
-                                <a href="<?php echo $view['router']->path('mautic_subscription_rate_delete', ['id' => $rate->getId()]); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('Are you sure you want to delete this rate?'); ?>" class="btn btn-danger btn-xs">
-                                    <i class="fa fa-trash-o"></i>
-                                </a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="4">
-                        <?php echo $view['translator']->trans('No subscription rates found.'); ?>
-                    </td>
-                </tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-Mautic.subscriptionRateOnLoad = function() {
-    var searchBtn = mQuery('#subscription-rate-search-btn');
-    var searchInput = mQuery('#subscription-rate-search');
-    
-    searchBtn.click(function() {
-        var searchValue = searchInput.val().trim();
-        var url = '<?php echo $view['router']->path('mautic_subscription_rates'); ?>';
-        
-        if (searchValue.length) {
-            url += '?search=' + encodeURIComponent(searchValue);
-        }
-        
-        window.location = url;
-    });
-    
-    searchInput.keyup(function(e) {
-        if (e.keyCode == 13) {
-            searchBtn.click();
-        }
-    });
-}</script> 
+</div> 

@@ -2,63 +2,59 @@
 
 declare(strict_types=1);
 
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use MauticPlugin\LodgeSubscriptionBundle\Controller\ReportController;
-use MauticPlugin\LodgeSubscriptionBundle\Controller\WebhookController;
-use MauticPlugin\LodgeSubscriptionBundle\Controller\RateController;
-use MauticPlugin\LodgeSubscriptionBundle\Controller\SubscriptionController;
-use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
-use MauticPlugin\LodgeSubscriptionBundle\Services\StripeService;
-use MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper;
 
-return function (ContainerConfigurator $configurator): void {
-    $services = $configurator->services()
-        ->defaults()
+return static function (ContainerConfigurator $containerConfigurator): void {
+    $services = $containerConfigurator->services();
+
+    // Enable autowiring for all services in this bundle
+    $services->defaults()
         ->autowire()
         ->autoconfigure()
         ->public();
 
-    $excludes = [
-        'Entity'
-    ];
-
+    // Register all classes in the bundle for autowiring
     $services->load('MauticPlugin\\LodgeSubscriptionBundle\\', '../')
-        ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-    
-    // Explicitly register the integration
-    $services->set('mautic.integration.lodgesubscription', \MauticPlugin\LodgeSubscriptionBundle\Integration\LodgeSubscriptionIntegration::class)
-        ->public()
-        ->tag('mautic.integration');
-    
-    // Register controllers explicitly to ensure proper autowiring
-    $services->set(ReportController::class)
-        ->public()
-        ->tag('controller.service_arguments');
-    
-    $services->set(WebhookController::class)
-        ->public()
-        ->tag('controller.service_arguments');
-    
-    $services->set(RateController::class)
-        ->public()
-        ->tag('controller.service_arguments');
-    
-    $services->set(SubscriptionController::class)
-        ->public()
-        ->tag('controller.service_arguments');
+        ->exclude([
+            '../{DependencyInjection,Entity,Migrations,Tests}',
+            '../*Bundle.php',
+        ]);
 
-    // Add service aliases for backward compatibility
-    $services->alias('mautic.lodge.service.stripe', \MauticPlugin\LodgeSubscriptionBundle\Services\StripeService::class);
-    $services->alias('mautic.lodge.helper.subscription', \MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper::class);
-    $services->alias('mautic.lodge.model.subscription', \MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel::class);
-
-    // Auto-register all classes in specific directories
-    $services->load('MauticPlugin\\LodgeSubscriptionBundle\\Controller\\', '../Controller/')
-        ->tag('controller.service_arguments')
+    // Explicit service definitions for better clarity and control
+    $services->set('MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel')
+        ->autowire()
         ->public();
-        
-    $services->load('MauticPlugin\\LodgeSubscriptionBundle\\Model\\', '../Model/');
-    $services->load('MauticPlugin\\LodgeSubscriptionBundle\\Services\\', '../Services/');
-    $services->load('MauticPlugin\\LodgeSubscriptionBundle\\Helper\\', '../Helper/');
+
+    $services->set('MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper')
+        ->autowire()
+        ->public();
+
+    $services->set('MauticPlugin\LodgeSubscriptionBundle\Services\StripeService')
+        ->autowire()
+        ->public();
+
+    $services->set('MauticPlugin\LodgeSubscriptionBundle\Controller\ReportController')
+        ->autowire()
+        ->public()
+        ->tag('controller.service_arguments');
+
+    $services->set('MauticPlugin\LodgeSubscriptionBundle\Controller\WebhookController')
+        ->autowire()
+        ->public()
+        ->tag('controller.service_arguments');
+
+    $services->set('MauticPlugin\LodgeSubscriptionBundle\Controller\RateController')
+        ->autowire()
+        ->public()
+        ->tag('controller.service_arguments');
+
+    $services->set('MauticPlugin\LodgeSubscriptionBundle\Form\Type\SubscriptionRateType')
+        ->autowire()
+        ->public()
+        ->tag('form.type');
+
+    // Service aliases for backward compatibility
+    $services->alias('lodge_subscription.model.subscription', 'MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel');
+    $services->alias('lodge_subscription.helper.subscription', 'MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper');
+    $services->alias('lodge_subscription.services.stripe', 'MauticPlugin\LodgeSubscriptionBundle\Services\StripeService');
 }; 

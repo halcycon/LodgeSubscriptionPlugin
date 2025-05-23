@@ -8,186 +8,83 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$view['slots']->set('mauticContent', 'subscriptionDashboard');
-$view['slots']->set('headerTitle', 'Subscription Dashboard');
+$view['slots']->set('mauticContent', 'lodge_subscription_dashboard');
+$view['slots']->set('headerTitle', 'Lodge Subscription Dashboard');
 ?>
 
-<?php if ($permissions['view']): ?>
-    <?php $view['slots']->start('actions'); ?>
-    <a href="<?php echo $view['router']->path('mautic_subscription_export', ['year' => $year]); ?>" class="btn btn-default" target="_blank">
-        <i class="fa fa-download"></i> <?php echo $view['translator']->trans('Export Report'); ?>
-    </a>
-    <?php $view['slots']->stop(); ?>
-<?php endif; ?>
-
-<div class="panel panel-default bdr-t-wdh-0">
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Year Selection</h3>
-                    </div>
-                    <div class="panel-body">
-                        <form method="get" action="<?php echo $view['router']->path('mautic_subscription_dashboard'); ?>">
-                            <div class="form-group">
-                                <label for="year">Select Year:</label>
-                                <select name="year" id="year" class="form-control">
-                                    <?php foreach ($years as $yr): ?>
-                                        <option value="<?php echo $yr; ?>" <?php echo $yr == $year ? 'selected' : ''; ?>>
-                                            <?php echo $yr; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+<div class="lodge-subscription-dashboard">
+    <!-- Year selector -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-dashboard"></i>
+                Lodge Subscription Overview for 
+                <select id="year-selector" onchange="changeYear(this.value)" class="form-control" style="display: inline-block; width: auto;">
+                    <?php foreach ($years as $yearOption): ?>
+                        <option value="<?php echo $yearOption; ?>" <?php echo $yearOption == $year ? 'selected' : ''; ?>>
+                            <?php echo $yearOption; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <!-- Member Statistics -->
+                <div class="col-sm-6 col-md-3">
+                    <div class="widget widget-stat bg-primary">
+                        <div class="widget-body">
+                            <div class="widget-icon">
+                                <i class="fa fa-users"></i>
                             </div>
-                            <button type="submit" class="btn btn-primary">View</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-md">
-            <div class="col-md-12">
-                <h3>Subscription Summary for <?php echo $year; ?></h3>
-            </div>
-        </div>
-
-        <div class="row mt-md">
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Member Statistics</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-6">Total Members:</div>
-                            <div class="col-md-6"><?php echo $stats['totalMembers']; ?></div>
-                        </div>
-                        <div class="row mt-sm">
-                            <div class="col-md-6">Paid Members:</div>
-                            <div class="col-md-6"><?php echo $stats['paidMembers']; ?></div>
-                        </div>
-                        <div class="row mt-sm">
-                            <div class="col-md-6">Unpaid Members:</div>
-                            <div class="col-md-6"><?php echo $stats['unpaidMembers']; ?></div>
-                        </div>
-                        <div class="row mt-sm">
-                            <div class="col-md-6">Payment Percentage:</div>
-                            <div class="col-md-6">
-                                <?php 
-                                    $percentage = $stats['totalMembers'] > 0 
-                                        ? round(($stats['paidMembers'] / $stats['totalMembers']) * 100, 1) 
-                                        : 0; 
-                                    echo $percentage . '%';
-                                ?>
+                            <div class="widget-content">
+                                <span class="widget-desc">Total Members</span>
+                                <span class="widget-title"><?php echo number_format($stats['totalMembers']); ?></span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Financial Summary</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-6">Current Year Total:</div>
-                            <div class="col-md-6">£<?php echo number_format($stats['currentTotal'], 2); ?></div>
-                        </div>
-                        <div class="row mt-sm">
-                            <div class="col-md-6">Arrears Total:</div>
-                            <div class="col-md-6">£<?php echo number_format($stats['arrearsTotal'], 2); ?></div>
-                        </div>
-                        <div class="row mt-sm">
-                            <div class="col-md-6"><strong>Total Outstanding:</strong></div>
-                            <div class="col-md-6"><strong>£<?php echo number_format($stats['grandTotal'], 2); ?></strong></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Payment Statistics</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-6">Total Payments:</div>
-                            <div class="col-md-6"><?php echo $paymentStats['paymentCount']; ?></div>
-                        </div>
-                        <div class="row mt-sm">
-                            <div class="col-md-6">Total Amount:</div>
-                            <div class="col-md-6">£<?php echo number_format($paymentStats['totalAmount'], 2); ?></div>
-                        </div>
-                        <div class="row mt-sm">
-                            <div class="col-md-6">Current Year:</div>
-                            <div class="col-md-6">£<?php echo number_format($paymentStats['totalAppliedToCurrent'], 2); ?></div>
-                        </div>
-                        <div class="row mt-sm">
-                            <div class="col-md-6">Applied to Arrears:</div>
-                            <div class="col-md-6">£<?php echo number_format($paymentStats['totalAppliedToArrears'], 2); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row mt-md">
-            <div class="col-md-12">
-                <div class="panel panel-danger">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Members With Outstanding Balances</h3>
-                    </div>
-                    <div class="panel-body">
-                        <p>Use these links to take action on members with outstanding balances:</p>
-                        <ul>
-                            <li><a href="#" class="btn btn-default btn-sm" onclick="mQuery('#unpaidSegment').toggle(); return false;">
-                                <i class="fa fa-filter"></i> Show/Hide Segment Builder Query
-                            </a></li>
-                            <li><a href="#" class="btn btn-warning btn-sm">
-                                <i class="fa fa-envelope"></i> Send Reminder Emails
-                            </a></li>
-                            <li><a href="#" class="btn btn-info btn-sm">
-                                <i class="fa fa-list"></i> View Unpaid Members Report
-                            </a></li>
-                        </ul>
-                        
-                        <div id="unpaidSegment" class="mt-md" style="display:none;">
-                            <h4>Segment Builder Query</h4>
-                            <pre>craft_paid_current = false AND craft_<?php echo $year; ?>_due = true</pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="row mt-md">
-            <div class="col-md-12">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Year-End Tools</h3>
-                    </div>
-                    <div class="panel-body">
-                        <p>Use these tools to manage year-end processes:</p>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="well">
-                                    <h4>Year-End Process</h4>
-                                    <p>Run the year-end process to move current year dues to arrears and set up new year dues.</p>
-                                    <p class="text-warning">This should be run at the end of <?php echo $year; ?>.</p>
-                                    <a href="#" class="btn btn-primary">Run Year-End Process</a>
-                                </div>
+                <!-- Paid Members -->
+                <div class="col-sm-6 col-md-3">
+                    <div class="widget widget-stat bg-success">
+                        <div class="widget-body">
+                            <div class="widget-icon">
+                                <i class="fa fa-check-circle"></i>
                             </div>
-                            <div class="col-md-6">
-                                <div class="well">
-                                    <h4>Set Next Year's Rate</h4>
-                                    <p>Make sure to set up the subscription rate for the next year before running the year-end process.</p>
-                                    <a href="<?php echo $view['router']->path('mautic_subscription_rate_new'); ?>" class="btn btn-success">Create New Rate</a>
-                                </div>
+                            <div class="widget-content">
+                                <span class="widget-desc">Paid Members</span>
+                                <span class="widget-title"><?php echo number_format($stats['paidMembers']); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unpaid Members -->
+                <div class="col-sm-6 col-md-3">
+                    <div class="widget widget-stat bg-warning">
+                        <div class="widget-body">
+                            <div class="widget-icon">
+                                <i class="fa fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="widget-content">
+                                <span class="widget-desc">Unpaid Members</span>
+                                <span class="widget-title"><?php echo number_format($stats['unpaidMembers']); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Outstanding -->
+                <div class="col-sm-6 col-md-3">
+                    <div class="widget widget-stat bg-danger">
+                        <div class="widget-body">
+                            <div class="widget-icon">
+                                <i class="fa fa-pound-sign"></i>
+                            </div>
+                            <div class="widget-content">
+                                <span class="widget-desc">Total Outstanding</span>
+                                <span class="widget-title">£<?php echo number_format($stats['grandTotal'], 2); ?></span>
                             </div>
                         </div>
                     </div>
@@ -195,4 +92,90 @@ $view['slots']->set('headerTitle', 'Subscription Dashboard');
             </div>
         </div>
     </div>
-</div> 
+
+    <!-- Financial Breakdown -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-chart-bar"></i>
+                Financial Breakdown
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Outstanding Amounts</h4>
+                    <table class="table table-striped">
+                        <tr>
+                            <td>Current Year Subscriptions:</td>
+                            <td class="text-right"><strong>£<?php echo number_format($stats['currentTotal'], 2); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td>Outstanding Arrears:</td>
+                            <td class="text-right"><strong>£<?php echo number_format($stats['arrearsTotal'], 2); ?></strong></td>
+                        </tr>
+                        <tr class="active">
+                            <td><strong>Total Outstanding:</strong></td>
+                            <td class="text-right"><strong>£<?php echo number_format($stats['grandTotal'], 2); ?></strong></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h4>Payment Statistics</h4>
+                    <table class="table table-striped">
+                        <tr>
+                            <td>Total Payments Received:</td>
+                            <td class="text-right"><strong>£<?php echo number_format($paymentStats['totalAmount'], 2); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td>Applied to Current Year:</td>
+                            <td class="text-right">£<?php echo number_format($paymentStats['totalAppliedToCurrent'], 2); ?></td>
+                        </tr>
+                        <tr>
+                            <td>Applied to Arrears:</td>
+                            <td class="text-right">£<?php echo number_format($paymentStats['totalAppliedToArrears'], 2); ?></td>
+                        </tr>
+                        <tr>
+                            <td>Number of Payments:</td>
+                            <td class="text-right"><?php echo number_format($paymentStats['paymentCount']); ?></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <?php if ($permissions['view']): ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-cogs"></i>
+                Quick Actions
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="btn-group" role="group">
+                <a href="<?php echo $view['router']->path('mautic_subscription_rates'); ?>" class="btn btn-default">
+                    <i class="fa fa-list"></i> Manage Subscription Rates
+                </a>
+                <a href="<?php echo $view['router']->path('mautic_subscription_export', ['year' => $year]); ?>" class="btn btn-primary">
+                    <i class="fa fa-download"></i> Export Payments (<?php echo $year; ?>)
+                </a>
+                <?php if ($permissions['create']): ?>
+                <a href="<?php echo $view['router']->path('mautic_subscription_rate_new'); ?>" class="btn btn-success">
+                    <i class="fa fa-plus"></i> Add New Rate
+                </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+</div>
+
+<script>
+function changeYear(year) {
+    window.location.href = '<?php echo $view['router']->path('mautic_subscription_dashboard'); ?>/' + year;
+}
+</script> 

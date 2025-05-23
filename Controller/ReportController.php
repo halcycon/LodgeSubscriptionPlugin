@@ -5,34 +5,42 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\RouterInterface;
 
-class ReportController
+class ReportController extends CommonController
 {
     protected EntityManagerInterface $entityManager;
     protected LeadModel $leadModel;
-    protected CorePermissions $security;
     protected SubscriptionModel $subscriptionModel;
     protected RouterInterface $router;
     
     public function __construct(
         EntityManagerInterface $entityManager,
         LeadModel $leadModel,
-        CorePermissions $security,
         SubscriptionModel $subscriptionModel,
-        RouterInterface $router
+        RouterInterface $router,
+        MauticFactory $factory,
+        CoreParametersHelper $coreParametersHelper,
+        CorePermissions $security,
+        FlashBag $flashBag
     ) {
         $this->entityManager = $entityManager;
         $this->leadModel = $leadModel;
-        $this->security = $security;
         $this->subscriptionModel = $subscriptionModel;
         $this->router = $router;
+        
+        // Call parent constructor for Mautic templating support
+        parent::__construct($factory, $coreParametersHelper, $security, $flashBag);
     }
 
     /**
@@ -40,6 +48,11 @@ class ReportController
      */
     public function dashboardAction(Request $request, $year = null): Response
     {
+        // Check permissions
+        if (!$this->security->isGranted('lodge:subscriptions:view')) {
+            return $this->accessDenied();
+        }
+
         if (!$year) {
             $year = (int) date('Y');
         }
@@ -69,19 +82,26 @@ class ReportController
         // Sort years
         rsort($years);
         
-        // Return HTML template response for main dashboard
-        $viewParameters = [
-            'stats' => $stats,
-            'paymentStats' => $paymentStats,
-            'year' => $year,
-            'years' => $years,
-            'permissions' => [
-                'view' => $this->security->isGranted('lodge:subscriptions:view'),
+        // Return HTML template response using Mautic's delegateView
+        return $this->delegateView([
+            'viewParameters' => [
+                'stats' => $stats,
+                'paymentStats' => $paymentStats,
+                'year' => $year,
+                'years' => $years,
+                'permissions' => [
+                    'view' => $this->security->isGranted('lodge:subscriptions:view'),
+                    'create' => $this->security->isGranted('lodge:subscriptions:create'),
+                    'edit' => $this->security->isGranted('lodge:subscriptions:edit'),
+                ]
+            ],
+            'contentTemplate' => 'LodgeSubscriptionBundle:Report:dashboard.html.php',
+            'passthroughVars' => [
+                'activeLink' => '#mautic_subscription_dashboard',
+                'mauticContent' => 'lodge_subscription_dashboard',
+                'route' => $this->generateUrl('mautic_subscription_dashboard', ['year' => $year])
             ]
-        ];
-        
-        // For now, return JSON until we have a proper view renderer
-        return new JsonResponse($viewParameters);
+        ]);
     }
 
     /**
@@ -89,6 +109,11 @@ class ReportController
      */
     public function dashboardApiAction(Request $request, $year = null): Response
     {
+        // Check permissions
+        if (!$this->security->isGranted('lodge:subscriptions:view')) {
+            return new JsonResponse(['error' => 'Access denied'], 403);
+        }
+
         if (!$year) {
             $year = (int) date('Y');
         }
@@ -135,6 +160,11 @@ class ReportController
      */
     public function exportAction(Request $request): Response
     {
+        // Check permissions
+        if (!$this->security->isGranted('lodge:subscriptions:view')) {
+            return $this->accessDenied();
+        }
+
         $year = $request->query->get('year', date('Y'));
         
         // Get payment repository
