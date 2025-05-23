@@ -16,7 +16,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     // Register all classes in the bundle for autowiring
     $services->load('MauticPlugin\\LodgeSubscriptionBundle\\', '../')
         ->exclude([
-            '../{Config,DependencyInjection,Entity,Migrations,Tests}',
+            '../{Config,DependencyInjection,Entity,Migration,Tests}',
             '../*Bundle.php',
         ]);
 
