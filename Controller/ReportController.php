@@ -38,7 +38,7 @@ class ReportController extends CommonController
     /**
      * Display subscription statistics dashboard (HTML view)
      */
-    public function dashboard(Request $request, $year = null): Response
+    public function dashboardAction(Request $request, $year = null): Response
     {
         if (!$year) {
             $year = (int) date('Y');
@@ -91,7 +91,7 @@ class ReportController extends CommonController
     /**
      * Dashboard API endpoint (JSON response)
      */
-    public function dashboardApi(Request $request, $year = null): Response
+    public function dashboardApiAction(Request $request, $year = null): Response
     {
         if (!$year) {
             $year = (int) date('Y');
@@ -137,7 +137,7 @@ class ReportController extends CommonController
     /**
      * Export payments report
      */
-    public function export(Request $request): Response
+    public function exportAction(Request $request): Response
     {
         $year = $request->query->get('year', date('Y'));
         
