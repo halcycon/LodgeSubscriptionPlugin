@@ -12,8 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends CommonController
 {
-    private StripeService $stripeService;
-    private LoggerInterface $logger;
+    protected StripeService $stripeService;
+    protected LoggerInterface $logger;
     
     public function __construct(
         StripeService $stripeService,

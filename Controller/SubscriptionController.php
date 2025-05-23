@@ -17,11 +17,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionController extends AbstractFormController
 {
-    private LeadModel $leadModel;
-    private CoreParametersHelper $coreParametersHelper;
-    private SubscriptionModel $subscriptionModel;
-    private SubscriptionHelper $subscriptionHelper;
-    private StripeService $stripeService;
+    protected LeadModel $leadModel;
+    protected CoreParametersHelper $coreParametersHelper;
+    protected SubscriptionModel $subscriptionModel;
+    protected SubscriptionHelper $subscriptionHelper;
+    protected StripeService $stripeService;
     
     public function __construct(
         LeadModel $leadModel,

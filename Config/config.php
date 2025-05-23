@@ -107,34 +107,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.lodge.subscriber.token' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\EventListener\TokenSubscriber::class,
-                'arguments' => [
-                    'mautic.lodge.service.stripe'
-                ]
-            ],
-            'mautic.lodge.subscriber.builder' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\EventListener\BuilderSubscriber::class,
-                'arguments' => []
-            ]
-        ],
-        'forms' => [
-            'mautic.lodge.form.type.config' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\Form\Type\ConfigType::class,
-                'arguments' => [
-                    'mautic.email.model.email'
-                ]
-            ]
-        ],
-        'models' => [
-            'mautic.lodge.model.subscription' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager'
-                ]
-            ]
-        ],
         'other' => [
             'mautic.lodge.service.stripe' => [
                 'class' => \MauticPlugin\LodgeSubscriptionBundle\Services\StripeService::class,
@@ -174,17 +146,6 @@ return [
                     'mautic.lead.model.dnc',
                 ],
             ],
-        ],
-        'commands' => [
-            'mautic.lodge.command.yearend' => [
-                'class' => \MauticPlugin\LodgeSubscriptionBundle\Command\YearEndProcessCommand::class,
-                'arguments' => [
-                    'mautic.lodge.helper.subscription',
-                    'mautic.lead.model.field',
-                    'mautic.email.model.email',
-                    'doctrine.orm.entity_manager'
-                ]
-            ]
         ]
     ],
 

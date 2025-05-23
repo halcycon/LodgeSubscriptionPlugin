@@ -14,9 +14,9 @@ use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
 
 class ReportController extends AbstractFormController
 {
-    private $leadModel;
-    private $entityManager;
-    private $subscriptionModel;
+    protected $leadModel;
+    protected $entityManager;
+    protected $subscriptionModel;
     
     /**
      * Constructor
