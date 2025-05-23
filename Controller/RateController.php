@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Doctrine\ORM\EntityManagerInterface;
 use MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate;
-use MauticPlugin\LodgeSubscriptionBundle\Form\Type\SubscriptionRateType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\EntityManagerInterface;
 
-class RateController extends AbstractFormController
+class RateController
 {
     protected EntityManagerInterface $entityManager;
     
@@ -44,17 +42,15 @@ class RateController extends AbstractFormController
             ->getRepository(SubscriptionRate::class)
             ->countRates();
 
-        return $this->delegateView([
-            'viewParameters' => [
-                'items'       => $rates,
-                'page'        => $page,
-                'limit'       => $limit,
-                'totalItems'  => $count,
-                'searchValue' => $search,
-            ],
-            'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:index.html.php',
-            'pagetitle' => 'Subscription Rates'
+        $content = json_encode([
+            'items'       => $rates,
+            'page'        => $page,
+            'limit'       => $limit,
+            'totalItems'  => $count,
+            'searchValue' => $search,
         ]);
+        
+        return new Response($content, 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -63,50 +59,37 @@ class RateController extends AbstractFormController
     public function newAction(Request $request): Response
     {
         $rate = new SubscriptionRate();
-        $form = $this->createForm(SubscriptionRateType::class, $rate);
-
+        
         if ($request->isMethod('POST')) {
-            if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form)) {
-                    $this->entityManager->persist($rate);
-                    $this->entityManager->flush();
-
-                    $this->addFlash(
-                        'mautic.core.notice.created',
-                        [
-                            '%name%'      => $rate->getYear(),
-                            '%menu_link%' => 'mautic_subscription_rates',
-                            '%url%'       => $this->generateUrl(
-                                'mautic_subscription_rate_edit',
-                                ['id' => $rate->getId()]
-                            ),
-                        ]
-                    );
-
-                    if ($form->get('buttons')->get('save')->isClicked()) {
-                        return $this->redirectToRoute('mautic_subscription_rates');
-                    }
-
-                    return $this->redirectToRoute('mautic_subscription_rate_edit', ['id' => $rate->getId()]);
+            $data = json_decode($request->getContent(), true);
+            
+            if (isset($data['year']) && isset($data['amount'])) {
+                $rate->setYear($data['year']);
+                $rate->setAmount($data['amount']);
+                
+                if (isset($data['description'])) {
+                    $rate->setDescription($data['description']);
                 }
-            } else {
-                return $this->redirectToRoute('mautic_subscription_rates');
+                
+                $this->entityManager->persist($rate);
+                $this->entityManager->flush();
+
+                return new JsonResponse([
+                    'success' => true,
+                    'message' => 'Rate created successfully',
+                    'id' => $rate->getId()
+                ]);
             }
+            
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Missing required fields: year and amount'
+            ], 400);
         }
 
-        return $this->delegateView(
-            [
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                ],
-                'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:form.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'subscriptionRate',
-                    'activeLink'    => '#mautic_subscription_rates',
-                    'route'         => $this->generateUrl('mautic_subscription_rate_new')
-                ],
-            ]
-        );
+        return new JsonResponse([
+            'message' => 'Please submit rate data via POST'
+        ]);
     }
 
     /**
@@ -117,56 +100,39 @@ class RateController extends AbstractFormController
         $rate = $this->entityManager->getRepository(SubscriptionRate::class)->find($id);
 
         if (!$rate) {
-            return $this->notFound();
+            return new JsonResponse(['error' => 'Rate not found'], 404);
         }
-
-        $form = $this->createForm(SubscriptionRateType::class, $rate);
 
         if ($request->isMethod('POST')) {
-            if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form)) {
-                    $rate->setDateModified(new \DateTime());
-                    
-                    $this->entityManager->persist($rate);
-                    $this->entityManager->flush();
-
-                    $this->addFlash(
-                        'mautic.core.notice.updated',
-                        [
-                            '%name%'      => $rate->getYear(),
-                            '%menu_link%' => 'mautic_subscription_rates',
-                            '%url%'       => $this->generateUrl(
-                                'mautic_subscription_rate_edit',
-                                ['id' => $rate->getId()]
-                            ),
-                        ]
-                    );
-
-                    if ($form->get('buttons')->get('save')->isClicked()) {
-                        return $this->redirectToRoute('mautic_subscription_rates');
-                    }
-
-                    return $this->redirectToRoute('mautic_subscription_rate_edit', ['id' => $rate->getId()]);
-                }
-            } else {
-                return $this->redirectToRoute('mautic_subscription_rates');
+            $data = json_decode($request->getContent(), true);
+            
+            if (isset($data['year'])) {
+                $rate->setYear($data['year']);
             }
+            if (isset($data['amount'])) {
+                $rate->setAmount($data['amount']);
+            }
+            if (isset($data['description'])) {
+                $rate->setDescription($data['description']);
+            }
+            
+            $rate->setDateModified(new \DateTime());
+            
+            $this->entityManager->persist($rate);
+            $this->entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Rate updated successfully'
+            ]);
         }
 
-        return $this->delegateView(
-            [
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                    'rate' => $rate,
-                ],
-                'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:form.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'subscriptionRate',
-                    'activeLink'    => '#mautic_subscription_rates',
-                    'route'         => $this->generateUrl('mautic_subscription_rate_edit', ['id' => $rate->getId()])
-                ],
-            ]
-        );
+        return new JsonResponse([
+            'id' => $rate->getId(),
+            'year' => $rate->getYear(),
+            'amount' => $rate->getAmount(),
+            'description' => $rate->getDescription()
+        ]);
     }
 
     /**
@@ -177,7 +143,7 @@ class RateController extends AbstractFormController
         $rate = $this->entityManager->getRepository(SubscriptionRate::class)->find($id);
 
         if (!$rate) {
-            return $this->notFound();
+            return new JsonResponse(['error' => 'Rate not found'], 404);
         }
 
         $year = $rate->getYear();
@@ -185,15 +151,10 @@ class RateController extends AbstractFormController
         $this->entityManager->remove($rate);
         $this->entityManager->flush();
 
-        $this->addFlash(
-            'mautic.core.notice.deleted',
-            [
-                '%name%' => $year,
-                '%menu_link%' => 'mautic_subscription_rates',
-            ]
-        );
-
-        return $this->redirectToRoute('mautic_subscription_rates');
+        return new JsonResponse([
+            'success' => true,
+            'message' => "Rate for year {$year} deleted successfully"
+        ]);
     }
 
     /**

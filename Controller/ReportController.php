@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-class ReportController extends AbstractFormController
+class ReportController
 {
-    protected $leadModel;
-    protected $entityManager;
-    protected $subscriptionModel;
-    protected $permissions;
+    protected LeadModel $leadModel;
+    protected EntityManagerInterface $entityManager;
+    protected SubscriptionModel $subscriptionModel;
+    protected CorePermissions $permissions;
     
     /**
      * Constructor
@@ -69,19 +68,18 @@ class ReportController extends AbstractFormController
         // Sort years
         rsort($years);
         
-        return $this->delegateView([
-            'viewParameters' => [
-                'stats' => $stats,
-                'paymentStats' => $paymentStats,
-                'year' => $year,
-                'years' => $years,
-                'permissions' => [
-                    'view' => $this->permissions->isGranted('lodge:subscriptions:view'),
-                ]
-            ],
-            'contentTemplate' => 'LodgeSubscriptionBundle:Report:dashboard.html.php',
-            'pagetitle' => 'Subscription Dashboard'
+        // Return basic response with data
+        $content = json_encode([
+            'stats' => $stats,
+            'paymentStats' => $paymentStats,
+            'year' => $year,
+            'years' => $years,
+            'permissions' => [
+                'view' => $this->permissions->isGranted('lodge:subscriptions:view'),
+            ]
         ]);
+        
+        return new Response($content, 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -131,27 +129,36 @@ class ReportController extends AbstractFormController
         return $response;
     }
 
-    public function annualReportAction(Request $request)
+    public function annualReportAction(Request $request): Response
     {
-        // ... existing code ...
+        $year = $request->query->get('year', date('Y'));
         
         $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
-        
-        // ... existing code ...
+        $paymentStats = $paymentRepo->getPaymentStatistics($year);
         
         $rateRepo = $this->entityManager
             ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
             ->getRateForYear($year);
         
-        // ... existing code ...
+        $content = json_encode([
+            'paymentStats' => $paymentStats,
+            'rate' => $rateRepo,
+            'year' => $year
+        ]);
+        
+        return new Response($content, 200, ['Content-Type' => 'application/json']);
     }
     
-    public function contactReportAction(Request $request, $contactId)
+    public function contactReportAction(Request $request, $contactId): Response
     {
-        // ... existing code ...
-        
         $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $payments = $paymentRepo->getContactPayments($contactId);
         
-        // ... existing code ...
+        $content = json_encode([
+            'contactId' => $contactId,
+            'payments' => $payments
+        ]);
+        
+        return new Response($content, 200, ['Content-Type' => 'application/json']);
     }
 } 

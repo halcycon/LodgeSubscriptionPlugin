@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\LodgeSubscriptionBundle\Form\Type\PaymentType;
 use MauticPlugin\LodgeSubscriptionBundle\Helper\SubscriptionHelper;
 use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
 use MauticPlugin\LodgeSubscriptionBundle\Services\StripeService;
@@ -15,7 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SubscriptionController extends AbstractFormController
+class SubscriptionController
 {
     protected LeadModel $leadModel;
     protected CoreParametersHelper $coreParametersHelper;
@@ -44,16 +42,14 @@ class SubscriptionController extends AbstractFormController
 
         $rates = $this->subscriptionModel->getSubscriptionRates($start, $limit);
         
-        return $this->delegateView([
-            'viewParameters' => [
-                'rates' => $rates,
-                'page' => $page,
-                'limit' => $limit,
-                'totalRates' => count($rates)
-            ],
-            'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:list.html.php',
-            'pagetitle' => 'Subscription Rates'
+        $content = json_encode([
+            'rates' => $rates,
+            'page' => $page,
+            'limit' => $limit,
+            'totalRates' => count($rates)
         ]);
+        
+        return new Response($content, 200, ['Content-Type' => 'application/json']);
     }
 
     public function newRateAction(Request $request): JsonResponse
@@ -116,7 +112,7 @@ class SubscriptionController extends AbstractFormController
     {
         $contact = $this->leadModel->getEntity($contactId);
         if (!$contact) {
-            return $this->notFound();
+            return new JsonResponse(['error' => 'Contact not found'], 404);
         }
 
         $currentOwed = (float)$contact->getFieldValue('craft_owed_current');
@@ -124,63 +120,40 @@ class SubscriptionController extends AbstractFormController
         $totalOwed = $currentOwed + $arrearsOwed;
         $currentYear = date('Y');
 
-        // Create the payment form
-        $form = $this->createForm(
-            PaymentType::class, 
-            [
-                'amount' => $totalOwed,
-                'contactId' => $contactId,
-                'year' => $currentYear,
-                'currentOwed' => $currentOwed,
-                'arrearsOwed' => $arrearsOwed
-            ]
-        );
-
         // Check if form is submitted
         if ($request->isMethod('POST')) {
-            if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form)) {
-                    $formData = $form->getData();
+            $data = json_decode($request->getContent(), true);
+            
+            if (isset($data['amount']) && isset($data['paymentMethod'])) {
+                try {
+                    // Record the payment
+                    $payment = $this->subscriptionHelper->recordPayment(
+                        $contactId,
+                        $data['amount'],
+                        $data['year'] ?? $currentYear,
+                        $data['paymentMethod'],
+                        null,
+                        'completed'
+                    );
                     
-                    try {
-                        // Record the payment
-                        $payment = $this->subscriptionHelper->recordPayment(
-                            $contactId,
-                            $formData['amount'],
-                            $formData['year'],
-                            $formData['paymentMethod'],
-                            null,
-                            'completed'
-                        );
-                        
-                        $this->addFlash(
-                            'mautic.core.notice.created',
-                            [
-                                '%name%' => 'Payment',
-                                '%menu_link%' => 'mautic_dashboard_index',
-                                '%url%' => $this->generateUrl('mautic_contact_action', 
-                                    ['objectAction' => 'view', 'objectId' => $contactId]
-                                ),
-                            ]
-                        );
-                        
-                        return $this->redirectToRoute('mautic_contact_action', [
-                            'objectAction' => 'view', 
-                            'objectId' => $contactId
-                        ]);
-                    } catch (\Exception $e) {
-                        $this->addFlash(
-                            'mautic.core.error.payment',
-                            ['%message%' => $e->getMessage()]
-                        );
-                    }
+                    return new JsonResponse([
+                        'success' => true,
+                        'message' => 'Payment recorded successfully',
+                        'paymentId' => $payment->getId()
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    return new JsonResponse([
+                        'success' => false,
+                        'message' => $e->getMessage()
+                    ], 500);
                 }
-            } else {
-                return $this->redirectToRoute('mautic_contact_action', [
-                    'objectAction' => 'view', 
-                    'objectId' => $contactId
-                ]);
             }
+            
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Missing required fields'
+            ], 400);
         }
 
         // Generate Stripe payment link if integration is enabled
@@ -198,26 +171,19 @@ class SubscriptionController extends AbstractFormController
             }
         }
 
-        return $this->delegateView(
-            [
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                    'contact' => $contact,
-                    'currentOwed' => $currentOwed,
-                    'arrearsOwed' => $arrearsOwed,
-                    'totalOwed' => $totalOwed,
-                    'stripePaymentLink' => $stripePaymentLink,
-                ],
-                'contentTemplate' => 'LodgeSubscriptionBundle:Subscription:payment_form.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'subscriptionPayment',
-                    'route' => $this->generateUrl(
-                        'mautic_subscription_payment_form', 
-                        ['contactId' => $contactId]
-                    )
-                ],
-            ]
-        );
+        $content = json_encode([
+            'contact' => [
+                'id' => $contact->getId(),
+                'name' => $contact->getName(),
+                'email' => $contact->getEmail()
+            ],
+            'currentOwed' => $currentOwed,
+            'arrearsOwed' => $arrearsOwed,
+            'totalOwed' => $totalOwed,
+            'stripePaymentLink' => $stripePaymentLink,
+        ]);
+        
+        return new Response($content, 200, ['Content-Type' => 'application/json']);
     }
 
     /**
