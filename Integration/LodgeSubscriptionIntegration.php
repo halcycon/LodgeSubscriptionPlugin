@@ -47,8 +47,10 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                 'label'      => 'mautic.lodge.stripe.publishable.key',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'       => 'form-control',
-                    'placeholder' => 'pk_test_...'
+                    'class'       => 'form-control no-datepicker',
+                    'placeholder' => 'pk_test_...',
+                    'data-toggle' => 'NO',
+                    'data-no-calendar' => 'true'
                 ],
                 'required'    => true,
             ]);

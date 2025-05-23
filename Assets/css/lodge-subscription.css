@@ -1,0 +1,18 @@
+/* Hide datepicker button for our fields */
+.no-datepicker + .btn-datepicker,
+#integration_details_apikeys_stripe_publishable_key + .btn-datepicker,
+label[for="integration_details_apikeys_stripe_publishable_key"].btn-datepicker {
+    display: none !important;
+}
+
+/* Add proper margin for fields */
+.no-datepicker {
+    margin-right: 0 !important;
+}
+
+/* Ensure fields use full width */
+#integration_details_apikeys_stripe_publishable_key,
+#integration_details_apikeys_stripe_secret_key,
+#integration_details_apikeys_stripe_webhook_secret {
+    width: 100% !important;
+} 

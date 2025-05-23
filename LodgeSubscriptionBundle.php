@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\LodgeSubscriptionBundle;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use Doctrine\DBAL\Schema\Schema;
@@ -31,5 +32,13 @@ class LodgeSubscriptionBundle extends PluginBundleBase
     public static function onPluginUpdate(Plugin $plugin, $em, $schema, $fromVersion)
     {
         // Handle plugin updates here
+    }
+    
+    /**
+     * Load plugin assets
+     */
+    public static function loadAssets(MauticFactory $factory)
+    {
+        $factory->getAssetsHelper()->addStylesheet('plugins/LodgeSubscriptionBundle/Assets/css/lodge-subscription.css');
     }
 } 

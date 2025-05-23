@@ -7,6 +7,12 @@ return [
     'version' => '1.0.0',
     'author' => 'Adam Camp',
 
+    // Add CSS files
+    'onLoadCallback' => 'loadAssets',
+    'css' => [
+        'plugins/LodgeSubscriptionBundle/Assets/css/lodge-subscription.css',
+    ],
+
     'routes' => [
         'main' => [
             'mautic_subscription_rates' => [
