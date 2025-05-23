@@ -28,9 +28,27 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     public function getRequiredKeyFields(): array
     {
         return [
-            'stripe_publishable_key' => 'mautic.lodge.stripe.publishable.key',
-            'stripe_secret_key'      => 'mautic.lodge.stripe.secret.key',
-            'stripe_webhook_secret'  => 'mautic.lodge.stripe.webhook.secret',
+            'stripe_publishable_key' => [
+                'label' => 'mautic.lodge.stripe.publishable.key',
+                'type' => 'text',
+                'required' => true,
+                'placeholder' => 'pk_test_...',
+                'tooltip' => 'mautic.lodge.stripe.publishable.key.tooltip',
+            ],
+            'stripe_secret_key' => [
+                'label' => 'mautic.lodge.stripe.secret.key',
+                'type' => 'password',
+                'required' => true,
+                'placeholder' => 'sk_test_...',
+                'tooltip' => 'mautic.lodge.stripe.secret.key.tooltip',
+            ],
+            'stripe_webhook_secret' => [
+                'label' => 'mautic.lodge.stripe.webhook.secret',
+                'type' => 'password',
+                'required' => true,
+                'placeholder' => 'whsec_...',
+                'tooltip' => 'mautic.lodge.stripe.webhook.secret.tooltip',
+            ],
         ];
     }
 
