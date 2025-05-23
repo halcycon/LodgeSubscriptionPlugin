@@ -2,26 +2,25 @@
 <html>
     <head>
         <?php $view['slots']->output('head'); ?>
-        <title><?php $view['slots']->output('pageTitle'); ?></title>
+        <title><?php $view['slots']->output('pageTitle', 'Lodge Payment'); ?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <?php echo $view['assets']->outputSystemStylesheets(); ?>
-        <link rel="stylesheet" href="<?php echo $view['assets']->getAssetUrl('plugins/LodgeSubscriptionPlugin/Assets/css/lodge-theme.css'); ?>" type="text/css" />
+        <link rel="stylesheet" href="<?php echo $view['assets']->getAssetUrl('plugins/LodgeSubscriptionBundle/Assets/css/lodge-theme.css'); ?>" type="text/css" />
         <?php $view['assets']->outputHeadDeclarations(); ?>
     </head>
     <body>
-        <div class="lodge-container">
+        <div class="lodge-payment-container">
             <div class="lodge-header">
-                <div class="lodge-logo">
-                    <img src="<?php echo $view['assets']->getAssetUrl('plugins/LodgeSubscriptionPlugin/Assets/img/lodge-logo.png'); ?>" alt="Lodge Logo">
-                </div>
+                <img src="<?php echo $view['assets']->getAssetUrl('plugins/LodgeSubscriptionBundle/Assets/img/lodge-logo.png'); ?>" alt="Lodge Logo">
+                <h1><?php $view['slots']->output('pageTitle', 'Lodge Payment'); ?></h1>
             </div>
             
             <div class="lodge-content">
-                <?php $view['slots']->output('content'); ?>
+                <?php $view['slots']->output('_content'); ?>
             </div>
             
             <div class="lodge-footer">
-                <p>&copy; <?php echo date('Y'); ?> - Lodge Subscription Manager</p>
+                <p>&copy; <?php echo date('Y'); ?> Lodge Subscription Service</p>
             </div>
         </div>
         

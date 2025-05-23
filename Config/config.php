@@ -20,34 +20,34 @@ return [
         'main' => [
             'mautic_subscription_rates' => [
                 'path' => '/lodge/rates/{page}',
-                'controller' => 'LodgeSubscriptionBundle:Rate:index',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\RateController::indexAction',
                 'defaults' => [
                     'page' => 1
                 ]
             ],
             'mautic_subscription_rate_new' => [
                 'path' => '/lodge/rate/new',
-                'controller' => 'LodgeSubscriptionBundle:Rate:new'
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\RateController::newAction'
             ],
             'mautic_subscription_rate_edit' => [
                 'path' => '/lodge/rate/{id}/edit',
-                'controller' => 'LodgeSubscriptionBundle:Rate:edit'
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\RateController::editAction'
             ],
             'mautic_subscription_rate_delete' => [
                 'path' => '/lodge/rate/{id}/delete',
-                'controller' => 'LodgeSubscriptionBundle:Rate:delete'
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\RateController::deleteAction'
             ],
             'mautic_subscription_rate_get' => [
                 'path' => '/lodge/rate/{year}/get',
-                'controller' => 'LodgeSubscriptionBundle:Rate:getRate'
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\RateController::getRateAction'
             ],
             'mautic_subscription_payment_form' => [
                 'path' => '/lodge/subscription/payment/{contactId}',
-                'controller' => 'LodgeSubscriptionBundle:Subscription:paymentForm'
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\SubscriptionController::paymentFormAction'
             ],
             'mautic_subscription_record_payment' => [
                 'path' => '/lodge/subscription/payment/record',
-                'controller' => 'LodgeSubscriptionBundle:Subscription:recordPayment',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\SubscriptionController::recordPaymentAction',
                 'method' => 'POST'
             ],
             'mautic_subscription_dashboard' => [
@@ -65,7 +65,7 @@ return [
         'api' => [
             'mautic_subscription_webhook' => [
                 'path' => '/lodge/webhook/stripe',
-                'controller' => 'LodgeSubscriptionBundle:Webhook:handle',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\WebhookController::handleAction',
                 'method' => 'POST'
             ]
         ]

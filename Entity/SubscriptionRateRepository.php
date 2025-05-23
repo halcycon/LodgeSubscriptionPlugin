@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace MauticPlugin\LodgeSubscriptionBundle\Entity;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;

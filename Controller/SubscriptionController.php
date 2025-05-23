@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -25,7 +28,7 @@ class SubscriptionController extends AbstractFormController
                 'limit' => $limit,
                 'totalRates' => count($rates)
             ],
-            'contentTemplate' => 'LodgeSubscriptionPlugin:SubscriptionRate:list.html.php',
+            'contentTemplate' => 'LodgeSubscriptionBundle:SubscriptionRate:list.html.php',
             'pagetitle' => 'Subscription Rates'
         ]);
     }
@@ -187,7 +190,7 @@ class SubscriptionController extends AbstractFormController
                     'totalOwed' => $totalOwed,
                     'stripePaymentLink' => $stripePaymentLink,
                 ],
-                'contentTemplate' => 'LodgeSubscriptionPlugin:Subscription:payment_form.html.php',
+                'contentTemplate' => 'LodgeSubscriptionBundle:Subscription:payment_form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'subscriptionPayment',
                     'route' => $this->generateUrl(
