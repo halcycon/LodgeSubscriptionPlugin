@@ -92,7 +92,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getFormLeadFields(): array
+    public function getFormLeadFields(array $settings = []): array
     {
         // Return configured fields
         return [
