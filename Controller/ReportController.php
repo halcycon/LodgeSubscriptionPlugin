@@ -4,13 +4,37 @@ declare(strict_types=1);
 
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
-use Mautic\CoreBundle\Controller\CommonController;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\RouterInterface;
 
-class ReportController extends CommonController
+class ReportController
 {
+    protected EntityManagerInterface $entityManager;
+    protected LeadModel $leadModel;
+    protected CorePermissions $security;
+    protected SubscriptionModel $subscriptionModel;
+    protected RouterInterface $router;
+    
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        LeadModel $leadModel,
+        CorePermissions $security,
+        SubscriptionModel $subscriptionModel,
+        RouterInterface $router
+    ) {
+        $this->entityManager = $entityManager;
+        $this->leadModel = $leadModel;
+        $this->security = $security;
+        $this->subscriptionModel = $subscriptionModel;
+        $this->router = $router;
+    }
+
     /**
      * Display subscription statistics dashboard (HTML view)
      */
@@ -20,20 +44,15 @@ class ReportController extends CommonController
             $year = (int) date('Y');
         }
 
-        // Get services from container
-        $subscriptionModel = $this->get('mautic.lodge.model.subscription');
-        $entityManager = $this->getDoctrine()->getManager();
-        $security = $this->get('mautic.security');
-
         // Get statistics using the injected model
-        $stats = $subscriptionModel->getSubscriptionStatusSummary($year);
+        $stats = $this->subscriptionModel->getSubscriptionStatusSummary($year);
         
         // Get payment statistics
-        $paymentRepo = $entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         $paymentStats = $paymentRepo->getPaymentStatistics($year);
         
         // Get available years for dropdown
-        $rates = $entityManager
+        $rates = $this->entityManager
             ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
             ->getAllRates();
         
@@ -50,23 +69,19 @@ class ReportController extends CommonController
         // Sort years
         rsort($years);
         
-        return $this->delegateView([
-            'viewParameters' => [
-                'stats' => $stats,
-                'paymentStats' => $paymentStats,
-                'year' => $year,
-                'years' => $years,
-                'permissions' => [
-                    'view' => $security->isGranted('lodge:subscriptions:view'),
-                ]
-            ],
-            'contentTemplate' => 'LodgeSubscriptionBundle:Report:dashboard.html.php',
-            'passthroughVars' => [
-                'activeLink' => '#mautic_subscription_dashboard',
-                'mauticContent' => 'lodge_subscription_dashboard',
-                'route' => $this->generateUrl('mautic_subscription_dashboard', ['year' => $year])
+        // Return HTML template response for main dashboard
+        $viewParameters = [
+            'stats' => $stats,
+            'paymentStats' => $paymentStats,
+            'year' => $year,
+            'years' => $years,
+            'permissions' => [
+                'view' => $this->security->isGranted('lodge:subscriptions:view'),
             ]
-        ]);
+        ];
+        
+        // For now, return JSON until we have a proper view renderer
+        return new JsonResponse($viewParameters);
     }
 
     /**
@@ -78,20 +93,15 @@ class ReportController extends CommonController
             $year = (int) date('Y');
         }
 
-        // Get services from container
-        $subscriptionModel = $this->get('mautic.lodge.model.subscription');
-        $entityManager = $this->getDoctrine()->getManager();
-        $security = $this->get('mautic.security');
-
         // Get statistics using the injected model
-        $stats = $subscriptionModel->getSubscriptionStatusSummary($year);
+        $stats = $this->subscriptionModel->getSubscriptionStatusSummary($year);
         
         // Get payment statistics
-        $paymentRepo = $entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         $paymentStats = $paymentRepo->getPaymentStatistics($year);
         
         // Get available years for dropdown
-        $rates = $entityManager
+        $rates = $this->entityManager
             ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
             ->getAllRates();
         
@@ -115,7 +125,7 @@ class ReportController extends CommonController
             'year' => $year,
             'years' => $years,
             'permissions' => [
-                'view' => $security->isGranted('lodge:subscriptions:view'),
+                'view' => $this->security->isGranted('lodge:subscriptions:view'),
             ]
         ]);
     }
@@ -127,12 +137,8 @@ class ReportController extends CommonController
     {
         $year = $request->query->get('year', date('Y'));
         
-        // Get services from container
-        $entityManager = $this->getDoctrine()->getManager();
-        $leadModel = $this->getModel('lead');
-        
         // Get payment repository
-        $paymentRepo = $entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         
         // Get all payments for the year
         $startDate = new \DateTime($year . '-01-01');
@@ -148,7 +154,7 @@ class ReportController extends CommonController
             $contactName = '';
             
             // Get contact name
-            $contact = $leadModel->getEntity($contactId);
+            $contact = $this->leadModel->getEntity($contactId);
             if ($contact) {
                 $contactName = $contact->getName();
             }
@@ -175,11 +181,10 @@ class ReportController extends CommonController
     {
         $year = $request->query->get('year', date('Y'));
         
-        $entityManager = $this->getDoctrine()->getManager();
-        $paymentRepo = $entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         $paymentStats = $paymentRepo->getPaymentStatistics($year);
         
-        $rateRepo = $entityManager
+        $rateRepo = $this->entityManager
             ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
             ->getRateForYear($year);
         
@@ -194,8 +199,7 @@ class ReportController extends CommonController
     
     public function contactReport(Request $request, $contactId): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $paymentRepo = $entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         $payments = $paymentRepo->getContactPayments($contactId);
         
         $content = json_encode([
