@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\LodgeSubscriptionBundle\Services\StripeService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends CommonController
@@ -18,17 +17,10 @@ class WebhookController extends CommonController
     
     public function __construct(
         StripeService $stripeService,
-        LoggerInterface $logger,
-        RequestStack $requestStack
+        LoggerInterface $logger
     ) {
         $this->stripeService = $stripeService;
         $this->logger = $logger;
-        
-        // Call parent constructor to properly initialize CommonController
-        parent::__construct();
-        
-        // Set the requestStack after parent initialization
-        $this->requestStack = $requestStack;
     }
     
     /**

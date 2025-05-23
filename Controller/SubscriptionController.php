@@ -13,7 +13,6 @@ use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
 use MauticPlugin\LodgeSubscriptionBundle\Services\StripeService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionController extends AbstractFormController
@@ -29,20 +28,13 @@ class SubscriptionController extends AbstractFormController
         CoreParametersHelper $coreParametersHelper,
         SubscriptionModel $subscriptionModel,
         SubscriptionHelper $subscriptionHelper,
-        StripeService $stripeService,
-        RequestStack $requestStack
+        StripeService $stripeService
     ) {
         $this->leadModel = $leadModel;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->subscriptionModel = $subscriptionModel;
         $this->subscriptionHelper = $subscriptionHelper;
         $this->stripeService = $stripeService;
-        
-        // Call parent constructor to properly initialize AbstractFormController
-        parent::__construct();
-        
-        // Set the requestStack after parent initialization
-        $this->requestStack = $requestStack;
     }
     
     public function indexAction($page = 1): Response
