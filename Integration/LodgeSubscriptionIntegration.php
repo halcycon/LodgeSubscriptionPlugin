@@ -62,7 +62,7 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     /**
      * Prevent Mautic from adding date/time fields by overriding this method
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ($formArea !== 'keys') {
             return;

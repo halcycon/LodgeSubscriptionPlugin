@@ -11,12 +11,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 class ReportController extends AbstractFormController
 {
     protected $leadModel;
     protected $entityManager;
     protected $subscriptionModel;
+    protected $permissions;
     
     /**
      * Constructor
@@ -24,11 +26,13 @@ class ReportController extends AbstractFormController
     public function __construct(
         LeadModel $leadModel, 
         EntityManagerInterface $entityManager,
-        SubscriptionModel $subscriptionModel
+        SubscriptionModel $subscriptionModel,
+        CorePermissions $permissions
     ) {
         $this->leadModel = $leadModel;
         $this->entityManager = $entityManager;
         $this->subscriptionModel = $subscriptionModel;
+        $this->permissions = $permissions;
     }
     
     /**
@@ -72,7 +76,7 @@ class ReportController extends AbstractFormController
                 'year' => $year,
                 'years' => $years,
                 'permissions' => [
-                    'view' => $this->security->isGranted('lodge:subscriptions:view'),
+                    'view' => $this->permissions->isGranted('lodge:subscriptions:view'),
                 ]
             ],
             'contentTemplate' => 'LodgeSubscriptionBundle:Report:dashboard.html.php',

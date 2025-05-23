@@ -6,7 +6,7 @@ declare(strict_types=1);
 return [
     'name' => 'Lodge Subscription Manager',
     'description' => 'Manages Lodge subscriptions with Stripe integration',
-    'version' => '1.0.0',
+    'version' => '1.0.1',
     'author' => 'Adam Camp',
 
     // Add CSS and JS files

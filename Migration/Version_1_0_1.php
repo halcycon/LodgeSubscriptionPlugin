@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
-class Version_1_0_0 extends AbstractMigration
+class Version_1_0_1 extends AbstractMigration
 {
     private $subscriptionRatesTable = 'lodge_subscription_rates';
     private $paymentsTable = 'lodge_payments';
