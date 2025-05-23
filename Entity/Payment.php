@@ -4,76 +4,126 @@ declare(strict_types=1);
 
 namespace MauticPlugin\LodgeSubscriptionBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * @ORM\Table(name="lodge_payments")
- * @ORM\Entity(repositoryClass="MauticPlugin\LodgeSubscriptionBundle\Entity\PaymentRepository")
- */
 class Payment extends CommonEntity
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
     private $id;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
     private $contactId;
-
-    /**
-     * @ORM\Column(type="decimal", precision=10, scale=2)
-     */
     private $amount;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
     private $year;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
     private $stripePaymentId;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
     private $paymentMethod; // 'stripe', 'cash', 'cheque', etc.
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
     private $status; // 'completed', 'pending', 'failed'
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
     private $dateAdded;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
     private $notes;
-
-    /**
-     * @ORM\Column(type="decimal", precision=10, scale=2)
-     */
     private $appliedToCurrent;
-
-    /**
-     * @ORM\Column(type="decimal", precision=10, scale=2)
-     */
     private $appliedToArrears;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
     private $receivedBy;
+
+    public static function loadMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->setTableName('lodge_payments');
+        $metadata->setCustomRepositoryClass('MauticPlugin\LodgeSubscriptionBundle\Entity\PaymentRepository');
+
+        // ID field
+        $metadata->mapField([
+            'fieldName' => 'id',
+            'type' => 'integer',
+            'id' => true,
+            'options' => [
+                'autoincrement' => true,
+            ],
+        ]);
+        $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_AUTO);
+
+        // Contact ID
+        $metadata->mapField([
+            'fieldName' => 'contactId',
+            'type' => 'integer',
+            'columnName' => 'contact_id',
+        ]);
+
+        // Amount
+        $metadata->mapField([
+            'fieldName' => 'amount',
+            'type' => 'decimal',
+            'precision' => 10,
+            'scale' => 2,
+        ]);
+
+        // Year
+        $metadata->mapField([
+            'fieldName' => 'year',
+            'type' => 'integer',
+        ]);
+
+        // Stripe Payment ID
+        $metadata->mapField([
+            'fieldName' => 'stripePaymentId',
+            'type' => 'string',
+            'length' => 255,
+            'nullable' => true,
+            'columnName' => 'stripe_payment_id',
+        ]);
+
+        // Payment Method
+        $metadata->mapField([
+            'fieldName' => 'paymentMethod',
+            'type' => 'string',
+            'length' => 50,
+            'columnName' => 'payment_method',
+        ]);
+
+        // Status
+        $metadata->mapField([
+            'fieldName' => 'status',
+            'type' => 'string',
+            'length' => 50,
+        ]);
+
+        // Date Added
+        $metadata->mapField([
+            'fieldName' => 'dateAdded',
+            'type' => 'datetime',
+            'columnName' => 'date_added',
+        ]);
+
+        // Notes
+        $metadata->mapField([
+            'fieldName' => 'notes',
+            'type' => 'text',
+            'nullable' => true,
+        ]);
+
+        // Applied to Current
+        $metadata->mapField([
+            'fieldName' => 'appliedToCurrent',
+            'type' => 'decimal',
+            'precision' => 10,
+            'scale' => 2,
+            'columnName' => 'applied_to_current',
+        ]);
+
+        // Applied to Arrears
+        $metadata->mapField([
+            'fieldName' => 'appliedToArrears',
+            'type' => 'decimal',
+            'precision' => 10,
+            'scale' => 2,
+            'columnName' => 'applied_to_arrears',
+        ]);
+
+        // Received By
+        $metadata->mapField([
+            'fieldName' => 'receivedBy',
+            'type' => 'string',
+            'length' => 255,
+            'nullable' => true,
+            'columnName' => 'received_by',
+        ]);
+    }
 
     public function __construct()
     {

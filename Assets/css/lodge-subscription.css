@@ -8,7 +8,17 @@ div[id="integration_details_apikeys"] .btn-tertiary.btn-icon,
 #integration_details_apikeys_stripe_publishable_key + .btn-datepicker,
 div[id="integration_details_apikeys"] input + .btn-datepicker,
 div[id="integration_details_apikeys"] .d-flex > label,
-#integration_details_apikeys .d-flex > label[class*="btn-"] {
+#integration_details_apikeys .d-flex > label[class*="btn-"],
+/* More specific selectors for the configuration form */
+form[name="integration_details"] .btn-datepicker,
+form[name="integration_details"] .btn.btn-tertiary.btn-icon.btn-nospin,
+div.tab-content .btn-datepicker,
+.tab-pane .btn-datepicker,
+.form-group .btn-datepicker,
+/* Target by size attribute as seen in the screenshot */
+label.btn.btn-tertiary.btn-icon.btn-nospin.btn-datepicker[for*="stripe"],
+label[size="32"],
+input[size="32"] + label {
     display: none !important;
     visibility: hidden !important;
     width: 0 !important;
@@ -45,5 +55,11 @@ div[id="integration_details_apikeys"] .form-group {
 
 /* Hide any floating size indicators */
 [size="32"] {
+    display: none !important;
+}
+
+/* Additional global datepicker hiding for this plugin */
+body.integration-config .btn-datepicker,
+body form[name="integration_details"] .btn-datepicker {
     display: none !important;
 } 

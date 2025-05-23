@@ -65,6 +65,17 @@ class SubscriptionRateRepository extends ServiceEntityRepository
     }
     
     /**
+     * Get the subscription rate for a specific year (alias for getForYear)
+     *
+     * @param int $year
+     * @return SubscriptionRate|null
+     */
+    public function getRateForYear($year)
+    {
+        return $this->getForYear($year);
+    }
+    
+    /**
      * Get all rates ordered by year
      *
      * @param string $orderDirection
