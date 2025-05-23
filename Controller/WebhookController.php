@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
-use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\LodgeSubscriptionBundle\Services\StripeService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class WebhookController extends CommonController
+class WebhookController
 {
     protected StripeService $stripeService;
     protected LoggerInterface $logger;
