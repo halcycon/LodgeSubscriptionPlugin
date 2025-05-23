@@ -13,13 +13,11 @@ return function (ContainerConfigurator $configurator): void {
         ->public();
 
     $excludes = [
+        'Entity'
     ];
 
     $services->load('MauticPlugin\\LodgeSubscriptionBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-
-    // Load entity repositories as services
-    $services->load('MauticPlugin\\LodgeSubscriptionBundle\\Entity\\', '../Entity/*Repository.php');
     
     // Add service aliases for backward compatibility
     $services->alias('mautic.lodge.service.stripe', \MauticPlugin\LodgeSubscriptionBundle\Services\StripeService::class);

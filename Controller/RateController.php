@@ -1,4 +1,3 @@
-// Controller/RateController.php
 <?php
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 

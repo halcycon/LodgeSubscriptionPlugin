@@ -1,10 +1,16 @@
 <?php
 namespace MauticPlugin\LodgeSubscriptionBundle\Entity;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class PaymentRepository extends EntityRepository
+class PaymentRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Payment::class);
+    }
+
     /**
      * Get payments for a specific contact
      */
