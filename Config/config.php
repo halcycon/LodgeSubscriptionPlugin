@@ -1,6 +1,8 @@
 <?php
 // Config/config.php
 
+declare(strict_types=1);
+
 return [
     'name' => 'Lodge Subscription Manager',
     'description' => 'Manages Lodge subscriptions with Stripe integration',
@@ -8,7 +10,6 @@ return [
     'author' => 'Adam Camp',
 
     // Add CSS and JS files
-    'onLoadCallback' => 'loadAssets',
     'css' => [
         'plugins/LodgeSubscriptionBundle/Assets/css/lodge-subscription.css',
     ],

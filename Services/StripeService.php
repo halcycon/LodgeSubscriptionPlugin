@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace MauticPlugin\LodgeSubscriptionBundle\Services;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
