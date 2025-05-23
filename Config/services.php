@@ -30,7 +30,7 @@ return function (ContainerConfigurator $configurator): void {
     // Specific service definitions with custom configuration
     $services->set(SubscriptionModel::class)
         ->args([
-            '$em' => '@doctrine.orm.entity_manager',
+            '$entityManager' => '@doctrine.orm.entity_manager',
             '$leadModel' => '@mautic.lead.model.lead',
             '$userModel' => '@mautic.user.model.user',
             '$logger' => '@monolog.logger.mautic'
@@ -38,13 +38,16 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(SubscriptionHelper::class)
         ->args([
-            '$em' => '@doctrine.orm.entity_manager'
+            '$leadModel' => '@mautic.lead.model.lead',
+            '$entityManager' => '@doctrine.orm.entity_manager',
+            '$userModel' => '@mautic.user.model.user'
         ]);
 
     $services->set(StripeService::class)
         ->args([
-            '$coreParametersHelper' => '@mautic.helper.core_parameters',
-            '$logger' => '@monolog.logger.mautic'
+            '$integrationHelper' => '@mautic.helper.integration',
+            '$router' => '@router',
+            '$subscriptionHelper' => '@'.SubscriptionHelper::class
         ]);
 
     $services->set(SubscriptionRateType::class)
