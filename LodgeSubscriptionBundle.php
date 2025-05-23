@@ -9,8 +9,10 @@ use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
+use Mautic\IntegrationsBundle\Bundle\AbstractPluginBundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class LodgeSubscriptionBundle extends PluginBundleBase
+class LodgeSubscriptionBundle extends AbstractPluginBundle
 {
     /**
      * Called when plugin is installed
@@ -41,5 +43,21 @@ class LodgeSubscriptionBundle extends PluginBundleBase
     {
         $factory->getAssetsHelper()->addStylesheet('plugins/LodgeSubscriptionBundle/Assets/css/lodge-subscription.css');
         $factory->getAssetsHelper()->addScript('plugins/LodgeSubscriptionBundle/Assets/js/lodge-subscription.js');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function boot(): void
+    {
+        parent::boot();
     }
 } 

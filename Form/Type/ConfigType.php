@@ -40,6 +40,7 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr' => [
                     'class' => 'form-control',
+                    'data-editor-skip' => 'true',
                 ],
                 'required' => true,
             ]
@@ -56,6 +57,7 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr' => [
                     'class' => 'form-control',
+                    'data-editor-skip' => 'true',
                 ],
                 'required' => false,
                 'placeholder' => 'Select email template...'

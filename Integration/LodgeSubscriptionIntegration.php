@@ -38,13 +38,14 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
 
     /**
      * Override the form field definitions
+     * Prevent CKEditor conflicts by using simpler field types
      */
     public function modifyForm($builder, $options): void
     {
         if (!empty($options['form_area']) && $options['form_area'] === 'keys') {
-            // Add a custom attribute to the parent builder
+            // Add a CSS class to help identify and style our form
             if (method_exists($builder, 'setAttributes')) {
-                $builder->setAttributes(['class' => 'lodge-subscription-form']);
+                $builder->setAttributes(['class' => 'lodge-subscription-form', 'data-editor-prevent' => 'true']);
             }
             
             // Define stripe_publishable_key as TextType
@@ -52,11 +53,14 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                 'label'      => 'mautic.lodge.stripe.publishable.key',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'       => 'form-control no-datepicker lodge-key-field',
-                    'placeholder' => 'pk_test_...',
-                    'data-toggle' => 'NO',
+                    'class'            => 'form-control no-datepicker lodge-key-field',
+                    'placeholder'      => 'pk_test_...',
+                    'data-toggle'      => 'tooltip',
                     'data-no-calendar' => 'true',
-                    'data-field-type' => 'text-only'
+                    'data-field-type'  => 'text-only',
+                    'autocomplete'     => 'off',
+                    'spellcheck'       => 'false',
+                    'autocorrect'      => 'off'
                 ],
                 'required'    => true,
             ]);
@@ -66,10 +70,13 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                 'label'      => 'mautic.lodge.stripe.secret.key',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'       => 'form-control lodge-key-field',
-                    'placeholder' => 'sk_test_...',
-                    'autocomplete' => 'off',
-                    'data-field-type' => 'password-only'
+                    'class'            => 'form-control lodge-key-field',
+                    'placeholder'      => 'sk_test_...',
+                    'autocomplete'     => 'off',
+                    'data-field-type'  => 'password-only',
+                    'data-toggle'      => 'tooltip',
+                    'spellcheck'       => 'false',
+                    'autocorrect'      => 'off'
                 ],
                 'required'    => true,
             ]);
@@ -79,10 +86,13 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
                 'label'      => 'mautic.lodge.stripe.webhook.secret',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'       => 'form-control lodge-key-field',
-                    'placeholder' => 'whsec_...',
-                    'autocomplete' => 'off',
-                    'data-field-type' => 'password-only'
+                    'class'            => 'form-control lodge-key-field',
+                    'placeholder'      => 'whsec_...',
+                    'autocomplete'     => 'off',
+                    'data-field-type'  => 'password-only',
+                    'data-toggle'      => 'tooltip',
+                    'spellcheck'       => 'false',
+                    'autocorrect'      => 'off'
                 ],
                 'required'    => true,
             ]);
