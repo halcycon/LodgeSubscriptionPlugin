@@ -37,6 +37,42 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     }
 
     /**
+     * Override to prevent date picker fields
+     */
+    public function getSecretKeys(): array
+    {
+        return [
+            'stripe_secret_key',
+            'stripe_webhook_secret'
+        ];
+    }
+
+    /**
+     * Override to specify field types explicitly
+     */
+    public function getFormFieldTypes(): array
+    {
+        return [
+            'stripe_publishable_key' => 'text',
+            'stripe_secret_key'      => 'password',
+            'stripe_webhook_secret'  => 'password',
+        ];
+    }
+
+    /**
+     * Prevent Mautic from adding date/time fields by overriding this method
+     */
+    public function appendToForm($builder, $data, $formArea): void
+    {
+        if ($formArea !== 'keys') {
+            return;
+        }
+
+        // Do nothing - prevent Mautic from adding its own fields
+        // Our modifyForm method will handle the field creation
+    }
+
+    /**
      * Override the form field definitions
      * Prevent CKEditor conflicts by using simpler field types
      */
