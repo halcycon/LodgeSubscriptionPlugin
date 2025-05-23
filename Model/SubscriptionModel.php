@@ -71,36 +71,71 @@ class SubscriptionModel extends AbstractCommonModel
      */
     public function getSubscriptionStatusSummary($year = null)
     {
+        // Default values
+        $defaultResult = [
+            'totalMembers' => 0,
+            'paidMembers' => 0,
+            'unpaidMembers' => 0,
+            'currentTotal' => 0,
+            'arrearsTotal' => 0,
+            'grandTotal' => 0
+        ];
+
         if ($year === null) {
             $year = date('Y');
         }
 
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('COUNT(l) as totalCount, SUM(l.craft_owed_current) as currentTotal, SUM(l.craft_owed_arrears) as arrearsTotal')
-           ->from('MauticLeadBundle:Lead', 'l')
-           ->where("l.craft_{$year}_due = :due")
-           ->setParameter('due', 1);
-
-        $result = $qb->getQuery()->getSingleResult();
-
-        $paidQb = $this->em->createQueryBuilder();
-        $paidQb->select('COUNT(l) as paidCount')
+        try {
+            // Validate that year is a simple numeric value to prevent SQL injection
+            if (!is_numeric($year)) {
+                return $defaultResult;
+            }
+            
+            $yearField = "craft_{$year}_due";
+            $paidField = "craft_{$year}_paid";
+            
+            // Check if the field exists
+            $metadata = $this->em->getClassMetadata('MauticLeadBundle:Lead');
+            if (!$metadata->hasField($yearField) || !$metadata->hasField($paidField)) {
+                return $defaultResult;
+            }
+            
+            $qb = $this->em->createQueryBuilder();
+            $qb->select('COUNT(l) as totalCount, SUM(l.craft_owed_current) as currentTotal, SUM(l.craft_owed_arrears) as arrearsTotal')
                ->from('MauticLeadBundle:Lead', 'l')
-               ->where("l.craft_{$year}_due = :due")
-               ->andWhere("l.craft_{$year}_paid = :paid")
-               ->setParameter('due', 1)
-               ->setParameter('paid', 1);
+               ->where("l.{$yearField} = :due")
+               ->setParameter('due', 1);
 
-        $paidResult = $paidQb->getQuery()->getSingleResult();
+            $result = $qb->getQuery()->getOneOrNullResult();
 
-        return [
-            'totalMembers' => $result['totalCount'] ?? 0,
-            'paidMembers' => $paidResult['paidCount'] ?? 0,
-            'unpaidMembers' => ($result['totalCount'] ?? 0) - ($paidResult['paidCount'] ?? 0),
-            'currentTotal' => $result['currentTotal'] ?? 0,
-            'arrearsTotal' => $result['arrearsTotal'] ?? 0,
-            'grandTotal' => ($result['currentTotal'] ?? 0) + ($result['arrearsTotal'] ?? 0)
-        ];
+            $paidQb = $this->em->createQueryBuilder();
+            $paidQb->select('COUNT(l) as paidCount')
+                   ->from('MauticLeadBundle:Lead', 'l')
+                   ->where("l.{$yearField} = :due")
+                   ->andWhere("l.{$paidField} = :paid")
+                   ->setParameter('due', 1)
+                   ->setParameter('paid', 1);
+
+            $paidResult = $paidQb->getQuery()->getOneOrNullResult();
+
+            return [
+                'totalMembers' => (int)($result['totalCount'] ?? 0),
+                'paidMembers' => (int)($paidResult['paidCount'] ?? 0),
+                'unpaidMembers' => (int)(($result['totalCount'] ?? 0) - ($paidResult['paidCount'] ?? 0)),
+                'currentTotal' => (float)($result['currentTotal'] ?? 0),
+                'arrearsTotal' => (float)($result['arrearsTotal'] ?? 0),
+                'grandTotal' => (float)(($result['currentTotal'] ?? 0) + ($result['arrearsTotal'] ?? 0))
+            ];
+        } catch (\Exception $e) {
+            // Log error if logger is available
+            if ($this->logger) {
+                $this->logger->error(
+                    'Error getting subscription status: ' . $e->getMessage(),
+                    ['exception' => $e]
+                );
+            }
+            return $defaultResult;
+        }
     }
 
     /**

@@ -130,15 +130,18 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
     {
         $settings = parent::getConfigFormSettings();
         
-        // Add custom settings tab
-        $settings['featureSettings'] = [
-            'label' => 'mautic.integration.form.feature.settings',
-            'data'  => [
-                'lodge_subscription_currency' => 'GBP',
-                'lodge_subscription_reminder_template' => null,
-            ],
-            'formType' => 'lodgesubscriptionconfig',
-        ];
+        // Add custom settings
+        if (isset($settings)) {
+            // Use traditional array syntax for safety
+            $settings['featureSettings'] = array(
+                'label' => 'mautic.integration.form.feature.settings',
+                'data'  => array(
+                    'lodge_subscription_currency' => 'GBP',
+                    'lodge_subscription_reminder_template' => null,
+                ),
+                'formType' => 'lodgesubscriptionconfig',
+            );
+        }
         
         return $settings;
     }
@@ -151,9 +154,20 @@ class LodgeSubscriptionIntegration extends AbstractIntegration
         // Return configured fields
         $featureSettings = $this->getIntegrationSettings()->getFeatureSettings();
         
-        return [
-            'lodge_subscription_currency' => $featureSettings['lodge_subscription_currency'] ?? 'GBP',
-            'lodge_subscription_reminder_template' => $featureSettings['lodge_subscription_reminder_template'] ?? null,
-        ];
+        $result = array(
+            'lodge_subscription_currency' => 'GBP',
+            'lodge_subscription_reminder_template' => null
+        );
+        
+        // If we have settings, use them
+        if (!empty($featureSettings['lodge_subscription_currency'])) {
+            $result['lodge_subscription_currency'] = $featureSettings['lodge_subscription_currency'];
+        }
+        
+        if (!empty($featureSettings['lodge_subscription_reminder_template'])) {
+            $result['lodge_subscription_reminder_template'] = $featureSettings['lodge_subscription_reminder_template'];
+        }
+        
+        return $result;
     }
 }

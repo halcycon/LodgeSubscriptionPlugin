@@ -55,9 +55,12 @@ class PaymentRepository extends ServiceEntityRepository
            ->setParameter('year', $year)
            ->setParameter('status', 'completed');
         
-        $result = $qb->getQuery()->getSingleScalarResult();
-        
-        return $result ? $result : 0;
+        try {
+            $result = $qb->getQuery()->getSingleScalarResult();
+            return $result ? $result : 0;
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
     
     /**
@@ -99,38 +102,47 @@ class PaymentRepository extends ServiceEntityRepository
      */
     public function getPaymentStatistics($year = null)
     {
-        if ($year === null) {
-            $year = date('Y');
-        }
-        
-        $qb = $this->createQueryBuilder('p');
-        $qb->select(
-            'SUM(p.amount) as totalAmount',
-            'SUM(p.appliedToCurrent) as totalAppliedToCurrent',
-            'SUM(p.appliedToArrears) as totalAppliedToArrears',
-            'COUNT(p.id) as paymentCount'
-        )
-        ->where('p.year = :year')
-        ->andWhere('p.status = :status')
-        ->setParameter('year', $year)
-        ->setParameter('status', 'completed');
-        
-        $result = $qb->getQuery()->getOneOrNullResult();
-        
-        if ($result) {
-            return [
-                'totalAmount' => (float)$result['totalAmount'],
-                'totalAppliedToCurrent' => (float)$result['totalAppliedToCurrent'],
-                'totalAppliedToArrears' => (float)$result['totalAppliedToArrears'],
-                'paymentCount' => (int)$result['paymentCount']
-            ];
-        }
-        
-        return [
+        // Default response with zero values
+        $defaultStats = [
             'totalAmount' => 0,
             'totalAppliedToCurrent' => 0,
             'totalAppliedToArrears' => 0,
             'paymentCount' => 0
         ];
+        
+        // Handle null values
+        if ($year === null) {
+            $year = date('Y');
+        }
+        
+        try {
+            $qb = $this->createQueryBuilder('p');
+            $qb->select(
+                'SUM(p.amount) as totalAmount',
+                'SUM(p.appliedToCurrent) as totalAppliedToCurrent',
+                'SUM(p.appliedToArrears) as totalAppliedToArrears',
+                'COUNT(p.id) as paymentCount'
+            )
+            ->where('p.year = :year')
+            ->andWhere('p.status = :status')
+            ->setParameter('year', $year)
+            ->setParameter('status', 'completed');
+            
+            $result = $qb->getQuery()->getOneOrNullResult();
+            
+            if ($result) {
+                return [
+                    'totalAmount' => (float)($result['totalAmount'] ?? 0),
+                    'totalAppliedToCurrent' => (float)($result['totalAppliedToCurrent'] ?? 0),
+                    'totalAppliedToArrears' => (float)($result['totalAppliedToArrears'] ?? 0),
+                    'paymentCount' => (int)($result['paymentCount'] ?? 0)
+                ];
+            }
+            
+            return $defaultStats;
+        } catch (\Exception $e) {
+            // Return default values in case of error
+            return $defaultStats;
+        }
     }
 } 

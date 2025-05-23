@@ -1,16 +1,36 @@
 <?php
+
+declare(strict_types=1);
+
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\LeadBundle\Model\LeadModel;
 
 class ReportController extends AbstractFormController
 {
+    private $leadModel;
+    private $entityManager;
+    
+    /**
+     * Constructor
+     */
+    public function __construct(
+        LeadModel $leadModel, 
+        EntityManagerInterface $entityManager
+    ) {
+        $this->leadModel = $leadModel;
+        $this->entityManager = $entityManager;
+    }
+    
     /**
      * Display subscription statistics dashboard
      */
-    public function dashboardAction($year = null)
+    public function dashboardAction(Request $request, $year = null): Response
     {
         if (!$year) {
             $year = date('Y');
@@ -23,11 +43,11 @@ class ReportController extends AbstractFormController
         $stats = $subscriptionModel->getSubscriptionStatusSummary($year);
         
         // Get payment statistics
-        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         $paymentStats = $paymentRepo->getPaymentStatistics($year);
         
         // Get available years for dropdown
-        $rates = $this->getDoctrine()
+        $rates = $this->entityManager
             ->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\SubscriptionRate')
             ->getAllRates();
         
@@ -35,6 +55,14 @@ class ReportController extends AbstractFormController
         foreach ($rates as $rate) {
             $years[] = $rate->getYear();
         }
+        
+        // Add current year if not in the list
+        if (!in_array(date('Y'), $years)) {
+            $years[] = date('Y');
+        }
+        
+        // Sort years
+        rsort($years);
         
         return $this->delegateView([
             'viewParameters' => [
@@ -46,7 +74,7 @@ class ReportController extends AbstractFormController
                     'view' => $this->security->isGranted('lodge:subscriptions:view'),
                 ]
             ],
-            'contentTemplate' => 'LodgeSubscriptionPlugin:Report:dashboard.html.php',
+            'contentTemplate' => 'LodgeSubscriptionBundle:Report:dashboard.html.php',
             'pagetitle' => 'Subscription Dashboard'
         ]);
     }
@@ -54,12 +82,12 @@ class ReportController extends AbstractFormController
     /**
      * Export payments report
      */
-    public function exportAction(Request $request)
+    public function exportAction(Request $request): Response
     {
         $year = $request->query->get('year', date('Y'));
         
         // Get payment repository
-        $paymentRepo = $this->getDoctrine()->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
+        $paymentRepo = $this->entityManager->getRepository('MauticPlugin\LodgeSubscriptionBundle\Entity\Payment');
         
         // Get all payments for the year
         $startDate = new \DateTime($year . '-01-01');
@@ -75,7 +103,7 @@ class ReportController extends AbstractFormController
             $contactName = '';
             
             // Get contact name
-            $contact = $this->getModel('lead')->getEntity($contactId);
+            $contact = $this->leadModel->getEntity($contactId);
             if ($contact) {
                 $contactName = $contact->getName();
             }
@@ -91,7 +119,7 @@ class ReportController extends AbstractFormController
             $csv .= "{$date},{$contactId},\"{$contactName}\",{$amount},{$method},{$status},{$appliedToCurrent},{$appliedToArrears},\"{$notes}\"\n";
         }
         
-        $response = new \Symfony\Component\HttpFoundation\Response($csv);
+        $response = new Response($csv);
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="lodge_payments_' . $year . '.csv"');
         

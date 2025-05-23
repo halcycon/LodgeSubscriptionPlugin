@@ -52,14 +52,14 @@ return [
             ],
             'mautic_subscription_dashboard' => [
                 'path' => '/lodge/dashboard/{year}',
-                'controller' => 'LodgeSubscriptionBundle:Report:dashboard',
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\ReportController::dashboardAction',
                 'defaults' => [
                     'year' => null
                 ]
             ],
             'mautic_subscription_export' => [
                 'path' => '/lodge/export',
-                'controller' => 'LodgeSubscriptionBundle:Report:export'
+                'controller' => 'MauticPlugin\LodgeSubscriptionBundle\Controller\ReportController::exportAction'
             ]
         ],
         'api' => [
