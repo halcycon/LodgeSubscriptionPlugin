@@ -17,6 +17,10 @@ class LodgeSubscriptionExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Config'));
-        $loader->load('services.php');
+        
+        // Load services if the file exists
+        if (file_exists(__DIR__.'/../Config/services.php')) {
+            $loader->load('services.php');
+        }
     }
 } 
