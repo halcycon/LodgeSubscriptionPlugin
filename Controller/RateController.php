@@ -10,19 +10,15 @@ use MauticPlugin\LodgeSubscriptionBundle\Form\Type\SubscriptionRateType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RateController extends AbstractFormController
 {
-    protected SessionInterface $session;
     protected EntityManagerInterface $entityManager;
     
     public function __construct(
-        SessionInterface $session,
         EntityManagerInterface $entityManager
     ) {
-        $this->session = $session;
         $this->entityManager = $entityManager;
     }
     
@@ -31,12 +27,14 @@ class RateController extends AbstractFormController
      */
     public function indexAction(Request $request, $page = 1): Response
     {
-        $limit  = $this->session->get('mautic.lodge.subscription.rate.limit', 10);
+        $session = $request->getSession();
+        
+        $limit  = $session->get('mautic.lodge.subscription.rate.limit', 10);
         $start  = (1 === $page) ? 0 : (($page - 1) * $limit);
-        $search = $request->get('search', $this->session->get('mautic.lodge.subscription.rate.search', ''));
+        $search = $request->get('search', $session->get('mautic.lodge.subscription.rate.search', ''));
 
-        $this->session->set('mautic.lodge.subscription.rate.search', $search);
-        $this->session->set('mautic.lodge.subscription.page', $page);
+        $session->set('mautic.lodge.subscription.rate.search', $search);
+        $session->set('mautic.lodge.subscription.page', $page);
 
         $rates = $this->entityManager
             ->getRepository(SubscriptionRate::class)
