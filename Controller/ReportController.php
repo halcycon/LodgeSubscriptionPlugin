@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\LodgeSubscriptionBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\LodgeSubscriptionBundle\Model\SubscriptionModel;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ReportController extends AbstractStandardFormController
+class ReportController extends CommonController
 {
     protected LeadModel $leadModel;
     protected EntityManagerInterface $entityManager;
